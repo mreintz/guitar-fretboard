@@ -110,10 +110,11 @@ def populateFretboard(ui, notes, intervals, frets):
                             intervalType = interval
                     except ValueError:
                         intervalType = ''
-
                 label.setStyleSheet("QLabel"
                             "{"
+                            "border : 3px solid ;"
                             f"{interval_colors.get(intervalType, labelColors[6])}"
+                            "border-color : black"
                             "}")
 
     ui.lines = []

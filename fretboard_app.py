@@ -286,9 +286,14 @@ def update():
 
     if ui.showChord:
         type = "chord"
+        notesString = " ".join([str(n) for n in ui.chord.notes])
+        #intervalsString = ", ".join(ui.chord.recipes[ui.chord.chord_type])
     else:
         type = "scale"
-    ui.titleLabel.setText(f"{translate(ui.rootNoteSelector.currentText())} {ui.scaleOrChordTypeSelector.currentText()} {type}")
+        notesString = " ".join([str(n) for n in ui.scale.notes])
+        #intervalsString = ", ".join([str(i) for i in ui.scale.intervals])
+
+    ui.titleLabel.setText(f"{translate(ui.rootNoteSelector.currentText())} {ui.scaleOrChordTypeSelector.currentText()} {type}: {translate(notesString)}") # {translate(intervalsString)}")
     title = ui.titleLabel.text()
     try:
         for string in replacementStrings.keys():

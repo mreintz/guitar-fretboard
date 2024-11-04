@@ -505,7 +505,7 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
     MainWindow.resize(MainWindow.minimumSizeHint())
     MainWindow.adjustSize()
 
-    ui.statusbar.showMessage("Scale or (C)hord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Arrows up/down and left/right for the root note and type selection. Clicking fret buttons zooms in.", 100000)
+    ui.statusbar.showMessage("<Space> to switch between Scale and Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Arrows up/down and left/right for the root note and type selection. Clicking fret buttons zooms in.", 100000)
 
     ui.rootNoteSelector.setFocus()
     return(True)

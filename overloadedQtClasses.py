@@ -16,7 +16,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
             self.notesOrIntervals.emit()
-        elif event.key() == QtCore.Qt.Key_C:
+        elif event.key() == QtCore.Qt.Key_Space:
             self.chordOrScale.emit()
         elif event.key() == QtCore.Qt.Key_N:
             self.nut.emit()

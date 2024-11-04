@@ -139,8 +139,8 @@ def populateFretboard(ui, notes, intervals, frets):
     for fret in range(frets[0], frets[1]+1):
         if fret > 0:
             button = QtWidgets.QPushButton(ui.centralwidget)
-            button.setMinimumSize(QtCore.QSize(fretWidths[fret - frets[0]], 40)) #(40, 40))
-            button.setMaximumSize(QtCore.QSize(fretWidths[fret - frets[0]], 40)) #(40, 40))
+            button.setMinimumSize(QtCore.QSize(fretWidths[fret - frets[0]+1], 40)) #(40, 40))
+            button.setMaximumSize(QtCore.QSize(fretWidths[fret - frets[0]+1], 40)) #(40, 40))
             font = QtGui.QFont()
             font.setPointSize(12)
             button.setFont(font)

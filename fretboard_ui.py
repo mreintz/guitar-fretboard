@@ -190,7 +190,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.titleLabel.setText(_translate("MainWindow", "C major scale"))
+        self.titleLabel.setText(_translate("MainWindow", "C major scale: C D E F G A B"))
         self.nutButton.setText(_translate("MainWindow", "N"))
         self.label_2.setText(_translate("MainWindow", "Notes"))
         self.label_3.setText(_translate("MainWindow", "Intervals"))

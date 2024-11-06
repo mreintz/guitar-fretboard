@@ -199,7 +199,7 @@ def populateFretboard(ui, notes, intervals, frets):
                                         f"{interval_colors.get(intervalType, labelColors[6])}"
                                         "border-color : black"
                                         "}")
-        peg.setText(text)
+        peg.setText(translate(text))
         i = i + 1
 
 def setFret(fret):
@@ -320,7 +320,7 @@ def tuning(string):
 
     if not match:
         ui.statusbar.showMessage(f"Not a valid tuning, reverting to {old}", 10000)
-        ui.tuningButtons[string].setText(old)
+        ui.tuningButtons[string].setText(translate(old))
     elif old != new:
         ui.tuning[string] = new
         ui.statusbar.showMessage(f"Tuning is now {''.join(ui.tuning)}", 10000)

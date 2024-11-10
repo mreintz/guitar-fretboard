@@ -71,7 +71,7 @@ def populateFretboard(ui, notes, intervals, frets):
         labelRow = []
         for column in row:
             label = QLabelClickable(ui.centralwidget, text=translate(column))
-            label.clicked.connect(lambda x=label: toggleTransparency(x))  
+            label.clicked.connect(lambda x=label: toggleTransparency(x))
             label.selected.connect(lambda x=label: selectRootFromLabel(x))
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
@@ -458,9 +458,9 @@ def initialSetup(ui, argv):
         t.returnPressed.connect(lambda string=i: tuning(string))
         i = i + 1
 
-    if len(argv) > 3:
+    if len(argv) > 4:
         try:
-            frets = tuple(map(int, argv[3].split(', ')))
+            frets = tuple([int(argv[3]), int(argv[4])])
             frets = tuple(sorted(frets))
             if max(frets) <= 24 and min(frets) >= 0:
                 ui.frets = frets
@@ -494,7 +494,7 @@ def initialSetup(ui, argv):
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populateFretboard(ui, notes, intervals, ui.frets)
-  
+
     try:
         root = argv[1].capitalize()
         type = argv[2]
@@ -520,7 +520,7 @@ def initialSetup(ui, argv):
             try:
                 if argv[1] == '--help':
                     print(
-f"""Syntax: fretboard_app.py <rootnote> <scale or chord type> "<fromfret>, <tofret>".
+f"""Syntax: fretboard_app.py <rootnote> <scale or chord type> <fromfret> <tofret>.
 Available rootnotes:
 {", ".join(ui.rootNotes)},
 

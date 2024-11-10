@@ -5,6 +5,7 @@ import fretboard_rc
 from musthe import *
 import sys
 import pandas as pd
+from overloadedQtClasses import QLabelClickable
 
 transparent = "background-color: rgba(255, 255, 255, 0%);"
 
@@ -69,7 +70,8 @@ def populateFretboard(ui, notes, intervals, frets):
         j = 1
         labelRow = []
         for column in row:
-            label = QtWidgets.QLabel(ui.centralwidget, text=translate(column))
+            label = QLabelClickable(ui.centralwidget, text=translate(column))
+            label.clicked.connect(lambda x=label: toggleTransparency(x))  #lambda thing='intervals': toggle(thing) 
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setObjectName(column)
@@ -202,6 +204,18 @@ def populateFretboard(ui, notes, intervals, frets):
         peg.setText(translate(text))
         i = i + 1
 
+def toggleTransparency(label):
+    print(f"clicked {label.text()}, transparency: {str(label.transparency)}!")
+    if not label.transparency:
+        ui.opacity_effect = QtWidgets.QGraphicsOpacityEffect()
+        ui.opacity_effect.setOpacity(0.3)
+        label.setGraphicsEffect(ui.opacity_effect)
+    else:
+        ui.opacity_effect = QtWidgets.QGraphicsOpacityEffect()
+        ui.opacity_effect.setOpacity(1.0)
+        label.setGraphicsEffect(ui.opacity_effect)
+    label.transparency = not label.transparency
+
 def setFret(fret):
     # Set new fret selection
     if not ui.fretSelected:
@@ -262,18 +276,26 @@ def update():
     for row in ui.labels:
         for label in row:
             ui.gridLayout.removeWidget(label)
+            label.setParent(None)
+            label.deleteLater()
 
     # Remove the buttons as well.
     for button in ui.fretButtons:
         ui.gridLayout.removeWidget(button)
+        button.setParent(None)
+        button.deleteLater()
 
     # And the fret lines:
     for line in ui.lines:
         ui.gridLayout.removeWidget(line)
+        line.setParent(None)
+        line.deleteLater()
 
     # And the dots:
     for dot in ui.fretMarkers:
         ui.gridLayout.removeWidget(dot)
+        dot.setParent(None)
+        dot.deleteLater()
 
     # Generate the new fretboard
     f = Fretboard(ui.tuning)
@@ -460,7 +482,7 @@ def initialSetup(ui, argv):
 
     ui.rootNoteSelector.addItems(rootNotes)
     populateFretboard(ui, notes, intervals, ui.frets)
-
+  
     try:
         root = argv[1].capitalize()
         type = argv[2]

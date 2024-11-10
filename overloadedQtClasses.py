@@ -44,3 +44,15 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
             return True
         else:
             return QtWidgets.QLineEdit.event(self,event)
+        
+class QLabelClickable(QtWidgets.QLabel):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.transparency = False
+
+    clicked = pyqtSignal()
+
+    def mousePressEvent(self, ev):
+        if ev.button() == Qt.RightButton:
+            print("Right!")
+        self.clicked.emit()

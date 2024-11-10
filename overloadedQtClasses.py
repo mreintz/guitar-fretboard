@@ -51,8 +51,10 @@ class QLabelClickable(QtWidgets.QLabel):
         self.transparency = False
 
     clicked = pyqtSignal()
+    selected = pyqtSignal()
 
     def mousePressEvent(self, ev):
-        #if ev.button() == Qt.RightButton:
-        #    print("Right!")
-        self.clicked.emit()
+        if ev.button() == Qt.RightButton:
+            self.selected.emit()
+        else:
+            self.clicked.emit()

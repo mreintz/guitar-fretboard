@@ -71,7 +71,8 @@ def populateFretboard(ui, notes, intervals, frets):
         labelRow = []
         for column in row:
             label = QLabelClickable(ui.centralwidget, text=translate(column))
-            label.clicked.connect(lambda x=label: toggleTransparency(x))  #lambda thing='intervals': toggle(thing) 
+            label.clicked.connect(lambda x=label: toggleTransparency(x))  
+            label.selected.connect(lambda x=label: selectRootFromLabel(x))
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setObjectName(column)
@@ -203,6 +204,18 @@ def populateFretboard(ui, notes, intervals, frets):
                                         "}")
         peg.setText(translate(text))
         i = i + 1
+
+def selectRootFromLabel(label):
+    selected = label.objectName()
+    if selected in ui.rootNotes:
+        ui.rootNoteSelector.setCurrentText(selected)
+    else:
+        for row in ui.enharmonics:
+            if selected in row:
+                for note in row:
+                    if note in ui.rootNotes:
+                        ui.rootNoteSelector.setCurrentText(note)
+    changeScaleOrChord()
 
 def toggleTransparency(label):
     if not label.transparency:
@@ -461,7 +474,7 @@ def initialSetup(ui, argv):
 
     ui.enharmonics = f.enharmonics
 
-    rootNotes = ['C',
+    ui.rootNotes = ['C',
                  'C#',
                  'Db',
                  'D',
@@ -479,7 +492,7 @@ def initialSetup(ui, argv):
                  'Bb',
                  'B',]
 
-    ui.rootNoteSelector.addItems(rootNotes)
+    ui.rootNoteSelector.addItems(ui.rootNotes)
     populateFretboard(ui, notes, intervals, ui.frets)
   
     try:
@@ -509,7 +522,7 @@ def initialSetup(ui, argv):
                     print(
 f"""Syntax: fretboard_app.py <rootnote> <scale or chord type> "<fromfret>, <tofret>".
 Available rootnotes:
-{", ".join(rootNotes)},
+{", ".join(ui.rootNotes)},
 
 Available scale types:
 maj, min, aug, dim, dom7, min7, maj7, aug7, dim7, m7dim5, sus2, sus4, open5

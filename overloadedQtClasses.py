@@ -53,6 +53,6 @@ class QLabelClickable(QtWidgets.QLabel):
     clicked = pyqtSignal()
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.RightButton:
-            print("Right!")
+        #if ev.button() == Qt.RightButton:
+        #    print("Right!")
         self.clicked.emit()

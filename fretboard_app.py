@@ -205,7 +205,6 @@ def populateFretboard(ui, notes, intervals, frets):
         i = i + 1
 
 def toggleTransparency(label):
-    print(f"clicked {label.text()}, transparency: {str(label.transparency)}!")
     if not label.transparency:
         ui.opacity_effect = QtWidgets.QGraphicsOpacityEffect()
         ui.opacity_effect.setOpacity(0.3)
@@ -308,11 +307,11 @@ def update():
 
     if ui.showChord:
         type = "chord"
-        notesString = " ".join([str(n) for n in ui.chord.notes])
+        notesString = "  ".join([str(n) for n in ui.chord.notes])
         #intervalsString = ", ".join(ui.chord.recipes[ui.chord.chord_type])
     else:
         type = "scale"
-        notesString = " ".join([str(n) for n in ui.scale.notes])
+        notesString = "  ".join([str(n) for n in ui.scale.notes])
         #intervalsString = ", ".join([str(i) for i in ui.scale.intervals])
 
     ui.titleLabel.setText(f"{translate(ui.rootNoteSelector.currentText())} {ui.scaleOrChordTypeSelector.currentText()} {type}: {translate(notesString)}") # {translate(intervalsString)}")

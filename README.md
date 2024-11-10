@@ -22,4 +22,8 @@ Command-line options available<br>
 ![image](https://github.com/user-attachments/assets/625e046b-5901-4e36-be95-94203ead7518)
 ![image](https://github.com/user-attachments/assets/2eb07517-eb29-4a5d-a49f-c76aeb87e415)
 
+Newest functionality: Click on labels to toggle transparency<br>
+![image](https://github.com/user-attachments/assets/d545b776-56ed-450f-a617-08e7726dfd9c)
+
+
 Compiled versions for Linux and Windows. Check out "releases".

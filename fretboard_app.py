@@ -264,22 +264,28 @@ def setFret(fret):
 
 def update():
     # Updates the GUI.
-
+    # Track if we are switching between chord and scale or not.
     showChord_old = ui.showChord
     ui.showChord = ui.scaleOrChordSlider.value()
     ui.showInterval = ui.notesOrIntervalsSlider.value()
 
     # If the note/chord slider is changed, update the corresponding combo box to reflect the change.
     if ui.showChord != showChord_old:
+        selection = ui.scaleOrChordTypeSelector.currentText()
         if ui.showChord:
             ui.scaleOrChordTypeSelector.clear()
             ui.scaleOrChordTypeSelector.addItems(ui.allChords)
+            # Try to switch to minor if we're in minor.
+            if ('minor' in selection) or (selection == 'aeolian'):
+                ui.scaleOrChordTypeSelector.setCurrentText('min')
             type = ui.scaleOrChordTypeSelector.currentText()
             root = ui.rootNoteSelector.currentText()
             ui.chord = Chord(Note(root), type)
         else:
             ui.scaleOrChordTypeSelector.clear()
             ui.scaleOrChordTypeSelector.addItems(ui.allScales)
+            if 'min' in selection:
+                ui.scaleOrChordTypeSelector.setCurrentText('natural_minor')
             type = ui.scaleOrChordTypeSelector.currentText()
             root = ui.rootNoteSelector.currentText()
             ui.scale = Scale(Note(root), type)
@@ -396,6 +402,22 @@ def toggle(thing):
             ui.scaleOrChordSlider.setValue(0)
         else:
             ui.scaleOrChordSlider.setValue(1)
+    elif thing == 'majmin':
+        if ui.scaleOrChordSlider.value() == 1:
+            if 'maj' in ui.scaleOrChordTypeSelector.currentText():
+                ui.scaleOrChordTypeSelector.setCurrentText('min')
+                changeScaleOrChord()
+            elif 'min' in ui.scaleOrChordTypeSelector.currentText():
+                ui.scaleOrChordTypeSelector.setCurrentText('maj')
+                changeScaleOrChord()
+        else:
+            if ('major' in ui.scaleOrChordTypeSelector.currentText()) or (ui.scaleOrChordTypeSelector.currentText() == 'ionian'):
+                ui.scaleOrChordTypeSelector.setCurrentText('natural_minor')
+                changeScaleOrChord()
+            elif ('minor' in ui.scaleOrChordTypeSelector.currentText()) or (ui.scaleOrChordTypeSelector.currentText() == 'aeolian'):
+                ui.scaleOrChordTypeSelector.setCurrentText('major')
+                changeScaleOrChord()
+            
     ui.rootNoteSelector.setFocus()
     return
 
@@ -431,12 +453,14 @@ def initialSetup(ui, argv):
     ui.rootNoteSelector.nut.connect(resetFrets)
     ui.rootNoteSelector.mode.connect(lambda thing='mode': select(thing))
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
+    ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
     ui.scaleOrChordTypeSelector.nut.connect(resetFrets)
     ui.scaleOrChordTypeSelector.root.connect(lambda thing='root': select(thing))
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
+    ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
@@ -539,7 +563,7 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
     MainWindow.resize(MainWindow.minimumSizeHint())
     MainWindow.adjustSize()
 
-    ui.statusbar.showMessage("<Space> to switch between Scale and Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Arrows up/down and left/right for the root note and type selection. Clicking fret buttons zooms in.", 100000)
+    ui.statusbar.showMessage("<Space>: Scale or Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Up/down and left/right for root note and type. Try 'M' to toggle maj/min. Clicking fret buttons zooms in. Left click for transparency, right click to set root note.", 100000)
 
     ui.rootNoteSelector.setFocus()
     return(True)

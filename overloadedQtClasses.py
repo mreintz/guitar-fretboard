@@ -13,6 +13,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
     mode = pyqtSignal()
     tuning = pyqtSignal()
     majmin = pyqtSignal()
+    help = pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
@@ -31,6 +32,8 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
             self.tuning.emit()
         elif event.key() == QtCore.Qt.Key_M:
             self.majmin.emit()
+        elif event.key() == QtCore.Qt.Key_Question:
+            self.help.emit()
         else:
             super(QComboBoxWithKeyEvents, self).keyPressEvent(event)
 

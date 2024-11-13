@@ -7,10 +7,9 @@ import sys
 import pandas as pd
 from overloadedQtClasses import QLabelClickable
 
-transparent = "background-color: rgba(255, 255, 255, 0%);"
+helpString = "<Space>: Scale or Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Up/down and left/right for root note and type. Try 'M' to toggle maj/min. Clicking fret buttons zooms in. Left click for transparency, right click to set root note. '?' for this message."
 
 fullFretboard = 2000
-
 firstFret = fullFretboard / 18
 remaining = fullFretboard - firstFret
 fretWidths = [round(firstFret)]
@@ -432,6 +431,9 @@ def select(thing):
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning.", 10000)
     return
 
+def helpMessage():
+    ui.statusbar.showMessage(helpString, 100000)
+
 def initialSetup(ui, argv):
     ui.showChord = False
     ui.showInterval = False
@@ -454,6 +456,7 @@ def initialSetup(ui, argv):
     ui.rootNoteSelector.mode.connect(lambda thing='mode': select(thing))
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
+    ui.rootNoteSelector.help.connect(helpMessage)
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
@@ -461,6 +464,7 @@ def initialSetup(ui, argv):
     ui.scaleOrChordTypeSelector.root.connect(lambda thing='root': select(thing))
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
+    ui.scaleOrChordTypeSelector.help.connect(helpMessage)
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
@@ -563,7 +567,7 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
     MainWindow.resize(MainWindow.minimumSizeHint())
     MainWindow.adjustSize()
 
-    ui.statusbar.showMessage("<Space>: Scale or Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Up/down and left/right for root note and type. Try 'M' to toggle maj/min. Clicking fret buttons zooms in. Left click for transparency, right click to set root note.", 100000)
+    helpMessage()
 
     ui.rootNoteSelector.setFocus()
     return(True)

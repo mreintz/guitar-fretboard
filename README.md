@@ -21,10 +21,9 @@ Customize tuning to your liking
 ![image](https://github.com/user-attachments/assets/8eabaa9f-deb0-43ea-8408-77bfeaeb4975)
 
 Command-line options available<br>
-![image](https://github.com/user-attachments/assets/625e046b-5901-4e36-be95-94203ead7518)
-![image](https://github.com/user-attachments/assets/2eb07517-eb29-4a5d-a49f-c76aeb87e415)
+![image](https://github.com/user-attachments/assets/c0f94845-bbe3-44fa-b16d-fbd56a206e87)
 
-Newest functionality: Click on labels to toggle transparency<br>
+Newest functionality: Click on labels to toggle transparency, right click to switch root note.<br>
 ![image](https://github.com/user-attachments/assets/d545b776-56ed-450f-a617-08e7726dfd9c)
 
 

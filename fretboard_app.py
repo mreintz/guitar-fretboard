@@ -407,14 +407,14 @@ def toggle(thing):
             if 'maj' in ui.scaleOrChordTypeSelector.currentText():
                 ui.scaleOrChordTypeSelector.setCurrentText('min')
                 changeScaleOrChord()
-            elif 'min' in ui.scaleOrChordTypeSelector.currentText():
+            else:
                 ui.scaleOrChordTypeSelector.setCurrentText('maj')
                 changeScaleOrChord()
         else:
             if ('major' in ui.scaleOrChordTypeSelector.currentText()) or (ui.scaleOrChordTypeSelector.currentText() == 'ionian'):
                 ui.scaleOrChordTypeSelector.setCurrentText('natural_minor')
                 changeScaleOrChord()
-            elif ('minor' in ui.scaleOrChordTypeSelector.currentText()) or (ui.scaleOrChordTypeSelector.currentText() == 'aeolian'):
+            else:
                 ui.scaleOrChordTypeSelector.setCurrentText('major')
                 changeScaleOrChord()
             

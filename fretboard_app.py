@@ -6,8 +6,18 @@ from musthe import *
 import sys
 import pandas as pd
 from overloadedQtClasses import QLabelClickable
+from help import Ui_Dialog
 
-helpString = "<Space>: Scale or Chord, Note or (I)nterval, Change (T)uning, Revert to (N)ormal. Up/down and left/right for root note and type. Try 'M' to toggle maj/min. Clicking fret buttons zooms in. Left click for transparency, right click to set root note. '?' for this message."
+helpString = """<Space>: Scale or Chord
+Note or (I)nterval.
+Change (T)uning.
+Revert to (N)ormal.
+Up/down and left/right for root note and type.
+'M' toggles maj/min.
+Clicking fret buttons zooms in.
+Left click for transparency.
+Right click to set root note.
+'?' for this message."""
 
 fullFretboard = 2000
 firstFret = fullFretboard / 18
@@ -431,8 +441,16 @@ def select(thing):
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning.", 10000)
     return
 
-def helpMessage():
-    ui.statusbar.showMessage(helpString, 100000)
+def helpMessage(showWindow):
+    ui.statusbar.showMessage(helpString.replace('.\n', ', '), 100000)
+    if showWindow:
+        help = QtWidgets.QDialog()
+        help_ui = Ui_Dialog()
+        help_ui.setupUi(help)
+        help_ui.buttonBox.accepted.connect(help.close)
+        help_ui.textEdit.setText(helpString)
+        help.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+        help.exec_()
 
 def initialSetup(ui, argv):
     ui.showChord = False
@@ -456,7 +474,7 @@ def initialSetup(ui, argv):
     ui.rootNoteSelector.mode.connect(lambda thing='mode': select(thing))
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
-    ui.rootNoteSelector.help.connect(helpMessage)
+    ui.rootNoteSelector.help.connect(lambda window=True: helpMessage(window))
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
@@ -567,7 +585,7 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
     MainWindow.resize(MainWindow.minimumSizeHint())
     MainWindow.adjustSize()
 
-    helpMessage()
+    helpMessage(False)
 
     ui.rootNoteSelector.setFocus()
     return(True)

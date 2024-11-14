@@ -426,7 +426,7 @@ def toggle(thing):
             else:
                 ui.scaleOrChordTypeSelector.setCurrentText('major')
                 changeScaleOrChord()
-            
+
     ui.rootNoteSelector.setFocus()
     return
 
@@ -444,13 +444,7 @@ def select(thing):
 def helpMessage(showWindow):
     ui.statusbar.showMessage(helpString.replace('.\n', ', '), 100000)
     if showWindow:
-        help = QtWidgets.QDialog()
-        help_ui = Ui_Dialog()
-        help_ui.setupUi(help)
-        help_ui.buttonBox.accepted.connect(help.close)
-        help_ui.textEdit.setText(helpString)
-        help.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
-        help.exec_()
+        help.show()
 
 def initialSetup(ui, argv):
     ui.showChord = False
@@ -594,6 +588,14 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     MainWindow.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+
+    help = QtWidgets.QDialog()
+    help_ui = Ui_Dialog()
+    help_ui.setupUi(help)
+    help_ui.buttonBox.accepted.connect(help.hide)
+    help_ui.textEdit.setText(helpString)
+    help.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+    help.hide()
 
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)

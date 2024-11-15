@@ -593,8 +593,10 @@ if __name__ == "__main__":
     help_ui = Ui_Dialog()
     help_ui.setupUi(help)
     help_ui.buttonBox.accepted.connect(help.hide)
-    help_ui.textEdit.setText(helpString)
+    help_ui.label.setText(helpString)
     help.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+    help.resize(help.minimumSizeHint())
+    help.adjustSize()
     help.hide()
 
     ui = Ui_MainWindow()

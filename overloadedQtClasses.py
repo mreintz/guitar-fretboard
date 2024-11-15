@@ -41,12 +41,16 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
     def __init__(self, parent):
         super().__init__(parent)
 
-    tune = pyqtSignal()
+    root = pyqtSignal()
 
     def event(self,event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
             self.returnPressed.emit()
             super(QLineEditTabReact, self).keyPressEvent(event)
+            return True
+        elif event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Escape:
+            self.root.emit()
+            super(QLineEditTabReact, self).keyPressEvent(event)            
             return True
         else:
             return QtWidgets.QLineEdit.event(self,event)

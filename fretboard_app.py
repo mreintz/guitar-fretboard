@@ -496,6 +496,7 @@ def initialSetup(ui, argv):
     i = 0
     for t in ui.tuningButtons:
         t.returnPressed.connect(lambda string=i: tuning(string))
+        t.root.connect(lambda thing='root': select(thing))
         i = i + 1
 
     if len(argv) > 4:

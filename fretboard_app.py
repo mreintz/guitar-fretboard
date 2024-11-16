@@ -9,14 +9,14 @@ from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 
 helpMessages = [
-    ['<space>', 'Scale or Chord'],
-    ['I',       'Note or (I)nterval'],
-    ['N',       'Revert to (N)ormal'],
+    ['<space>', 'Toggle between scale and chord'],
+    ['I',       'Show notes or (I)ntervals'],
+    ['N',       'Revert number of frets to (N)ormal'],
     ['Arrows',  'Select root note and type'],
-    ['M',       'Toggle between major and minor'],
+    ['M',       'Toggle between (M)ajor and (M)inor modes'],
     ['Fret buttons',    'Click to zoom in on frets'],
-    ['Left click', 'Set/unset transparency'],
-    ['Right click', 'Set root note'],
+    ['Left click', 'Set/unset transparency on a note/interval'],
+    ['Right click', 'Set root note to the note below the cursor'],
     ['?',       'Display this message']
 ]
 
@@ -599,6 +599,7 @@ def setupHelpDialog(helpDialog):
         label1 = QtWidgets.QLabel(helpDialog)
         label2 = QtWidgets.QLabel(helpDialog)
         label1.setText(text1)
+        label1.setAlignment(QtCore.Qt.AlignCenter)
         label2.setText(text2)
         helpDialogUi.gridLayout.addWidget(label1, i, 0, 1, 1)
         helpDialogUi.gridLayout.addWidget(label2, i, 1, 1, 1)

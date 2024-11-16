@@ -6,14 +6,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
     def __init__(self, parent):
         super().__init__(parent)
 
-    notesOrIntervals = pyqtSignal()
-    chordOrScale = pyqtSignal()
-    nut = pyqtSignal()
-    root = pyqtSignal()
-    mode = pyqtSignal()
-    tuning = pyqtSignal()
-    majmin = pyqtSignal()
-    help = pyqtSignal()
+    notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help = [ pyqtSignal() for i in range(8) ]
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
@@ -41,7 +34,7 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
     def __init__(self, parent):
         super().__init__(parent)
 
-    root = pyqtSignal()
+    escape = pyqtSignal()
 
     def event(self,event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
@@ -49,7 +42,7 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
             super(QLineEditTabReact, self).keyPressEvent(event)
             return True
         elif event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Escape:
-            self.root.emit()
+            self.escape.emit()
             super(QLineEditTabReact, self).keyPressEvent(event)            
             return True
         else:
@@ -60,8 +53,7 @@ class QLabelClickable(QtWidgets.QLabel):
         super().__init__(parent, **kwargs)
         self.transparency = False
 
-    clicked = pyqtSignal()
-    selected = pyqtSignal()
+    clicked, selected = [ pyqtSignal() for i in range(2) ]
 
     def mousePressEvent(self, ev):
         if ev.button() == Qt.RightButton:

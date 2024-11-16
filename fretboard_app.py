@@ -77,11 +77,9 @@ def populateFretboard(ui, notes, intervals, frets):
         fretboard = df[ fret_slice ].values.tolist()
 
     # Setting up the labels...
-    i = 0
-    for row in fretboard:
-        j = 1
+    for i, row in enumerate(fretboard):
         labelRow = []
-        for column in row:
+        for j, column in enumerate(row, start=1):
             label = QLabelClickable(ui.centralwidget, text=translate(column))
             label.clicked.connect(lambda x=label: toggleTransparency(x))
             label.selected.connect(lambda x=label: selectRootFromLabel(x))
@@ -93,8 +91,6 @@ def populateFretboard(ui, notes, intervals, frets):
             label.setFont(font)
             ui.gridLayout.addWidget(label, i, 2*j+1, 1, 1)
             labelRow.append(label)
-            j = j + 1
-        i = i + 1
         ui.labels.append(labelRow)
 
     # "Flatten" the notes and intervals into a single list for easy lookup.
@@ -179,8 +175,7 @@ def populateFretboard(ui, notes, intervals, frets):
             ui.fretMarkers.append(dot)
 
     # Set up the "tuning peg" values and interval colors if open strings are on the chord or scale.
-    i = 0
-    for peg in ui.tuningButtons:
+    for i, peg in enumerate(ui.tuningButtons):
         text = ui.tuning[i]
         peg.setStyleSheet("QLineEdit")
 
@@ -217,7 +212,6 @@ def populateFretboard(ui, notes, intervals, frets):
                                         "border-color : black"
                                         "}")
         peg.setText(translate(text))
-        i = i + 1
 
 def selectRootFromLabel(label):
     # Set the root note to the note right-clicked.
@@ -500,11 +494,9 @@ def initialSetup(ui, argv):
         ui.tuning_1
     ]
 
-    i = 0
-    for t in ui.tuningButtons:
+    for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
-        i = i + 1
 
     # Accept CLI arguments to set frets if possible.
     if len(argv) > 4:
@@ -599,8 +591,7 @@ def setupHelpDialog(helpDialog):
     helpDialogUi.setupUi(helpDialog)
     helpDialogUi.buttonBox.accepted.connect(helpDialog.hide)
 
-    i = 0
-    for row in helpMessages:
+    for i, row in enumerate(helpMessages):
         text1 = row[0]
         text2 = row[1]
         label1, label2 = [ QtWidgets.QLabel(helpDialog) for i in range(2) ]
@@ -609,7 +600,6 @@ def setupHelpDialog(helpDialog):
         label2.setText(text2)
         helpDialogUi.gridLayout.addWidget(label1, i, 0, 1, 1)
         helpDialogUi.gridLayout.addWidget(label2, i, 1, 1, 1)
-        i = i + 1
 
     helpDialog.setWindowTitle("Commands and hotkeys")
     helpDialog.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))

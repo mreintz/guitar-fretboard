@@ -6,18 +6,20 @@ from musthe import *
 import sys
 import pandas as pd
 from overloadedQtClasses import QLabelClickable
-from help import Ui_Dialog
+from helpDialog import HelpDialog
 
-helpString = """<Space>: Scale or Chord
-Note or (I)nterval.
-Change (T)uning.
-Revert to (N)ormal.
-Up/down and left/right for root note and type.
-'M' toggles maj/min.
-Clicking fret buttons zooms in.
-Left click for transparency.
-Right click to set root note.
-'?' for this message."""
+helpMessages = [
+    ['<space>', 'Scale or Chord'],
+    ['I',       'Note or (I)nterval'],
+    ['N',       'Revert to (N)ormal'],
+    ['Arrows',  'Select root note and type'],
+    ['M',       'Toggle between major and minor'],
+    ['Fret buttons',    'Click to zoom in on frets'],
+    ['Left click', 'Set/unset transparency'],
+    ['Right click', 'Set root note'],
+    ['?',       'Display this message']
+]
+
 
 fullFretboard = 2000
 firstFret = fullFretboard / 18
@@ -442,9 +444,9 @@ def select(thing):
     return
 
 def helpMessage(showWindow):
-    ui.statusbar.showMessage(helpString.replace('.\n', ', '), 100000)
+    ui.statusbar.showMessage("Press '?' to see list of commands and hotkeys.", 100000)
     if showWindow:
-        help.show()
+        helpDialog.show()
 
 def initialSetup(ui, argv):
     ui.showChord = False
@@ -585,20 +587,36 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
     ui.rootNoteSelector.setFocus()
     return(True)
 
+def setupHelpDialog(helpDialog):
+    helpDialogUi = HelpDialog()
+    helpDialogUi.setupUi(helpDialog)
+    helpDialogUi.buttonBox.accepted.connect(helpDialog.hide)
+
+    i = 0
+    for row in helpMessages:
+        text1 = row[0]
+        text2 = row[1]
+        label1 = QtWidgets.QLabel(helpDialog)
+        label2 = QtWidgets.QLabel(helpDialog)
+        label1.setText(text1)
+        label2.setText(text2)
+        helpDialogUi.gridLayout.addWidget(label1, i, 0, 1, 1)
+        helpDialogUi.gridLayout.addWidget(label2, i, 1, 1, 1)
+        i = i + 1
+
+    helpDialog.setWindowTitle("Commands and hotkeys")
+    helpDialog.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+    helpDialog.resize(helpDialog.minimumSizeHint())
+    helpDialog.adjustSize()
+    helpDialog.hide()
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     MainWindow.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
 
-    help = QtWidgets.QDialog()
-    help_ui = Ui_Dialog()
-    help_ui.setupUi(help)
-    help_ui.buttonBox.accepted.connect(help.hide)
-    help_ui.label.setText(helpString)
-    help.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
-    help.resize(help.minimumSizeHint())
-    help.adjustSize()
-    help.hide()
+    helpDialog = QtWidgets.QDialog()
+    setupHelpDialog(helpDialog)
 
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)

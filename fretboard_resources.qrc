@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>guitar.png</file>
     <file>headstock.png</file>
   </qresource>
 </RCC>

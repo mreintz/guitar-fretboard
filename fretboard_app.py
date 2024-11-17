@@ -602,7 +602,7 @@ def setupHelpDialog(helpDialog):
         helpDialogUi.gridLayout.addWidget(label2, i, 1, 1, 1)
 
     helpDialog.setWindowTitle("Commands and hotkeys")
-    helpDialog.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+    helpDialog.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
     helpDialog.resize(helpDialog.minimumSizeHint())
     helpDialog.adjustSize()
     helpDialog.hide()
@@ -610,7 +610,7 @@ def setupHelpDialog(helpDialog):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/headstock.png"))
+    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
 
     helpDialog = QtWidgets.QDialog()
     setupHelpDialog(helpDialog)

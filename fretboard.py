@@ -2,8 +2,9 @@ from musthe import *
 import pandas as pd
 
 class Fretboard():
+    """Generate Fretboard object with tuning."""
     def __init__(self, tuning):
-
+        """Fretboard(tuning<list>) e.g. Fretboard([['E', 'A', 'B', 'G', 'D', 'E'])"""
         self.enharmonics = [
             ['C',  'C',  'B#',  'Dbb'],
             ['C#', 'Db'              ],
@@ -44,6 +45,8 @@ class Fretboard():
             string = string + 1
 
     def build(self, **kwargs):
+        """chord=<musthe Chord> OR scale=<musthe Scale>, optional frets=(<fromfret>, <tofret>)
+        Returns notes, intervals."""
         if kwargs:
             if 'chord' in kwargs:
                 self.chord = kwargs['chord']
@@ -104,6 +107,7 @@ class Fretboard():
         return self.notes_grid, self.intervals_grid
 
     def printPlain(self):
+        """After running build(), this function can print a plain version of the fretboard to console."""
         def plainprint(grid):
             for row in grid:
                 for note in row:

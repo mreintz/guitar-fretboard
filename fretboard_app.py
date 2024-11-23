@@ -7,6 +7,9 @@ import sys
 import pandas as pd
 from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
+import json
+
+settingsFile = "fretboard_settings.json"
 
 helpMessages = [
     ['<space>', 'Toggle between scale and chord'],
@@ -482,7 +485,7 @@ def initialSetup(ui, argv):
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    ui.frets = (0,24)
+    #ui.frets = (0,24)
     ui.scale = Scale(Note('C'), 'major')
 
     for i, t in enumerate(ui.tuningButtons):
@@ -598,19 +601,50 @@ def setupHelpDialog(helpDialog):
     helpDialog.adjustSize()
     helpDialog.hide()
 
+def writeSettings(settings):
+    with open(settingsFile, 'w') as f:
+        json.dump(settings, f)
+
+class MyMainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+    def closeEvent(self, event):
+        settings = {
+            'tuning':   ui.tuning,
+            'strings':  ui.strings,
+            'frets':    ui.frets,
+            'title':    MainWindow.windowTitle()
+        }
+        print(f"Writing settings to {settingsFile}.")
+        writeSettings(settings)
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
+    MainWindow = MyMainWindow()
 
     helpDialog = QtWidgets.QDialog()
     setupHelpDialog(helpDialog)
-
     ui = Ui_MainWindow()
-    ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
-    ui.tuning = ui.tuning[1:]
-    ui.setupUi(MainWindow, strings=6)
-    MainWindow.setWindowTitle("Guitar fretboard, scales and chords")
+
+    try:
+        with open(settingsFile, 'r') as f:
+            settings = json.load(f)
+            ui.tuning = settings['tuning']
+            ui.strings = settings['strings']
+            ui.frets = settings['frets']
+            ui.title = settings['title']
+    except:
+        ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+        ui.tuning = ui.tuning[1:]
+        ui.strings = 6
+        ui.frets = (0,24)
+        ui.title = "Guitar fretboard, scales and chords"
+
+    ui.setupUi(MainWindow, strings=ui.strings)
+
+    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
+    MainWindow.setWindowTitle(ui.title)
 
     success = initialSetup(ui, sys.argv)
     if success:

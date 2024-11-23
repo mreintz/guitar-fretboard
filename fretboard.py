@@ -3,8 +3,12 @@ import pandas as pd
 
 class Fretboard():
     """Generate Fretboard object with tuning."""
-    def __init__(self, tuning):
-        """Fretboard(tuning<list>) e.g. Fretboard([['E', 'A', 'B', 'G', 'D', 'E'])"""
+    def __init__(self, tuning=...):
+        """Fretboard(tuning=tuning) (a list of notes), defaults to ['E', 'A', 'B', 'G', 'D', 'E'])"""
+
+        if tuning==...:
+            tuning = ['E', 'A', 'B', 'G', 'D', 'E']
+        
         self.enharmonics = [
             ['C',  'C',  'B#',  'Dbb'],
             ['C#', 'Db'              ],
@@ -122,10 +126,10 @@ class Fretboard():
 
         def header():
             try:
-                print(f'{str(self.chord.notes[0])} {self.chord.chord_type} chord')
+                print(f'{str(self.chord.notes[0])} {self.chord.chord_type} chord: {" ".join([str(n) for n in self.chord.notes])}')
             except AttributeError:
                 try:
-                    print(f'{str(self.scale.root)} {self.scale.name} scale')
+                    print(f'{str(self.scale.root)} {self.scale.name} scale: {" ".join([str(n) for n in self.scale.notes])}')
                 except AttributeError:
                     pass
 

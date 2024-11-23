@@ -323,7 +323,7 @@ def update():
         clearFromGrid(dot)
 
     # Generate the new notes and intervals.
-    f = Fretboard(ui.tuning)
+    f = Fretboard(tuning=ui.tuning)
     if ui.showChord:
         notes, intervals = f.build(chord=ui.chord, frets=ui.frets)
     else:
@@ -360,7 +360,8 @@ def update():
 def tuning(string):
     # Deal with changes in tuning from one of the tuning peg input boxes.
     old = ui.tuning[string]
-    new = ui.tuningButtons[string].text().capitalize()
+    ui.tuningButtons[string].setText(ui.tuningButtons[string].text().capitalize())
+    new = ui.tuningButtons[string].text()
 
     match = False
     for row in ui.enharmonics:
@@ -510,7 +511,7 @@ def initialSetup(ui, argv):
 
     ui.frets_old = ui.frets
 
-    f = Fretboard(ui.tuning)
+    f = Fretboard(tuning=ui.tuning)
     notes, intervals = f.build(scale=ui.scale, frets=ui.frets)
 
     ui.enharmonics = f.enharmonics

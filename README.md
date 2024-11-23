@@ -26,5 +26,8 @@ Command-line options available<br>
 Newest functionality: Click on labels to toggle transparency, right click to switch root note.<br>
 ![image](https://github.com/user-attachments/assets/d545b776-56ed-450f-a617-08e7726dfd9c)
 
+Newest functionality: Now supports other-than-six strings and settings file<br>
+![image](https://github.com/user-attachments/assets/db385a69-00ef-4980-abf1-24a27f56db2a)
+![image](https://github.com/user-attachments/assets/fe2460fd-6df0-4d99-bb21-7de3fbb3f921)
 
 Compiled versions for Linux and Windows. Check out "releases".

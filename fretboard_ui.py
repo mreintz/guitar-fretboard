@@ -12,7 +12,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow, strings=...):
+        if strings==...:
+            strings=6
+        self.strings=strings
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1301, 581)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -32,15 +36,20 @@ class Ui_MainWindow(object):
         self.verticalLayout.addItem(spacerItem)
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.tuning_2 = QLineEditTabReact(self.centralwidget)
-        self.tuning_2.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_2.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_2.setFont(font)
-        self.tuning_2.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_2.setObjectName("tuning_2")
-        self.gridLayout.addWidget(self.tuning_2, 1, 0, 1, 1)
+
+        self.tuningButtons = [ QLineEditTabReact(self.centralwidget) for i in range(strings) ]
+
+        for i, button in enumerate(self.tuningButtons):
+            button.setMinimumSize(QtCore.QSize(40, 40))
+            button.setMaximumSize(QtCore.QSize(40, 16777215))
+            font = QtGui.QFont()
+            font.setPointSize(12)
+            button.setFont(font)
+            button.setAlignment(QtCore.Qt.AlignCenter)
+            self.gridLayout.addWidget(button, i, 0, 1, 1)
+
+        self.tuningButtons.reverse()            
+
         self.nutButton = QtWidgets.QPushButton(self.centralwidget)
         self.nutButton.setMinimumSize(QtCore.QSize(40, 40))
         self.nutButton.setMaximumSize(QtCore.QSize(40, 40))
@@ -48,52 +57,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.nutButton.setFont(font)
         self.nutButton.setObjectName("nutButton")
-        self.gridLayout.addWidget(self.nutButton, 6, 0, 1, 1)
-        self.tuning_3 = QLineEditTabReact(self.centralwidget)
-        self.tuning_3.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_3.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_3.setFont(font)
-        self.tuning_3.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_3.setObjectName("tuning_3")
-        self.gridLayout.addWidget(self.tuning_3, 2, 0, 1, 1)
-        self.tuning_4 = QLineEditTabReact(self.centralwidget)
-        self.tuning_4.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_4.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_4.setFont(font)
-        self.tuning_4.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_4.setObjectName("tuning_4")
-        self.gridLayout.addWidget(self.tuning_4, 3, 0, 1, 1)
-        self.tuning_1 = QLineEditTabReact(self.centralwidget)
-        self.tuning_1.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_1.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_1.setFont(font)
-        self.tuning_1.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_1.setObjectName("tuning_1")
-        self.gridLayout.addWidget(self.tuning_1, 0, 0, 1, 1)
-        self.tuning_6 = QLineEditTabReact(self.centralwidget)
-        self.tuning_6.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_6.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_6.setFont(font)
-        self.tuning_6.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_6.setObjectName("tuning_6")
-        self.gridLayout.addWidget(self.tuning_6, 5, 0, 1, 1)
-        self.tuning_5 = QLineEditTabReact(self.centralwidget)
-        self.tuning_5.setMinimumSize(QtCore.QSize(40, 40))
-        self.tuning_5.setMaximumSize(QtCore.QSize(40, 16777215))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.tuning_5.setFont(font)
-        self.tuning_5.setAlignment(QtCore.Qt.AlignCenter)
-        self.tuning_5.setObjectName("tuning_5")
-        self.gridLayout.addWidget(self.tuning_5, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.nutButton, strings, 0, 1, 1)
+
         self.verticalLayout.addLayout(self.gridLayout)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
@@ -176,12 +141,11 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        MainWindow.setTabOrder(self.tuning_6, self.tuning_5)
-        MainWindow.setTabOrder(self.tuning_5, self.tuning_4)
-        MainWindow.setTabOrder(self.tuning_4, self.tuning_3)
-        MainWindow.setTabOrder(self.tuning_3, self.tuning_2)
-        MainWindow.setTabOrder(self.tuning_2, self.tuning_1)
-        MainWindow.setTabOrder(self.tuning_1, self.rootNoteSelector)
+
+        for i in range(strings-1):
+            MainWindow.setTabOrder(self.tuningButtons[i], self.tuningButtons[i+1])
+
+        MainWindow.setTabOrder(self.tuningButtons[strings-1], self.rootNoteSelector)
         MainWindow.setTabOrder(self.rootNoteSelector, self.scaleOrChordTypeSelector)
         MainWindow.setTabOrder(self.scaleOrChordTypeSelector, self.notesOrIntervalsSlider)
         MainWindow.setTabOrder(self.notesOrIntervalsSlider, self.scaleOrChordSlider)

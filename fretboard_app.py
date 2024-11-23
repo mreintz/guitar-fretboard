@@ -140,7 +140,7 @@ def populateFretboard(ui, notes, intervals, frets):
         line.setMidLineWidth(0)
         line.setFrameShape(QtWidgets.QFrame.VLine)
         line.setObjectName(f"freLine{i}")
-        ui.gridLayout.addWidget(line, 0, 2*i, 6, 1)
+        ui.gridLayout.addWidget(line, 0, 2*i, ui.strings, 1)
         ui.lines.append(line)
         i = i + 1
 
@@ -160,7 +160,7 @@ def populateFretboard(ui, notes, intervals, frets):
             button.setObjectName("fretButton" + str(fret))
             button.setText(str(fret))
             button.setFocusPolicy(QtCore.Qt.ClickFocus)
-            ui.gridLayout.addWidget(button, 6, 2*j+1, 1, 1)
+            ui.gridLayout.addWidget(button, ui.strings, 2*j+1, 1, 1)
             ui.fretButtons.append(button)
             button.clicked.connect(lambda state, x=fret: setFret(x))
             j = j + 1
@@ -171,7 +171,7 @@ def populateFretboard(ui, notes, intervals, frets):
                 dot.setText(fretMarker)
             else:
                 dot.setText(fretMarker+fretMarker)
-            ui.gridLayout.addWidget(dot, 7, 2*j-1, 1, 1)
+            ui.gridLayout.addWidget(dot, ui.strings+1, 2*j-1, 1, 1)
             ui.fretMarkers.append(dot)
 
     # Set up the "tuning peg" values and interval colors if open strings are on the chord or scale.
@@ -438,8 +438,8 @@ def select(thing):
     elif thing == 'root':
         ui.rootNoteSelector.setFocus()
     elif thing == 'tuning':
-        ui.tuning_6.setFocus()
-        ui.tuning_6.selectAll()
+        ui.tuningButtons[0].setFocus()
+        ui.tuningButtons[0].selectAll()
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning, Esc to return.", 10000)
     return
 
@@ -482,18 +482,8 @@ def initialSetup(ui, argv):
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    ui.tuning = ['E', 'A', 'D', 'G', 'B', 'E']
     ui.frets = (0,24)
     ui.scale = Scale(Note('C'), 'major')
-
-    ui.tuningButtons = [
-        ui.tuning_6,
-        ui.tuning_5,
-        ui.tuning_4,
-        ui.tuning_3,
-        ui.tuning_2,
-        ui.tuning_1
-    ]
 
     for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
@@ -617,7 +607,9 @@ if __name__ == "__main__":
     setupHelpDialog(helpDialog)
 
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+    ui.tuning = ui.tuning[1:]
+    ui.setupUi(MainWindow, strings=6)
     MainWindow.setWindowTitle("Guitar fretboard, scales and chords")
 
     success = initialSetup(ui, sys.argv)

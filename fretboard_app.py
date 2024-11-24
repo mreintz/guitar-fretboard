@@ -630,6 +630,7 @@ if __name__ == "__main__":
     setupHelpDialog(helpDialog)
     ui = Ui_MainWindow()
 
+    # First load settings from file if available
     try:
         with open(settingsFile, 'r') as f:
             settings = json.load(f)
@@ -655,6 +656,8 @@ if __name__ == "__main__":
     MainWindow.setWindowTitle(ui.title)
 
     success = initialSetup(ui)
+
+    # Use CLI arguments if available
     getArgs(sys.argv)
 
     if success:

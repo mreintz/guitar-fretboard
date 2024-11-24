@@ -167,10 +167,10 @@ def populateFretboard(ui, notes, intervals, frets):
             ui.fretButtons.append(button)
             button.clicked.connect(lambda state, x=fret: setFret(x))
             j = j + 1
-        if fret in [3, 5, 7, 9, 12, 15, 17, 19, 21]:
+        if fret in ( ui.markers['single'] + ui.markers['double'] ):
             dot = QtWidgets.QLabel(ui.centralwidget, text=translate(column))
             dot.setAlignment(QtCore.Qt.AlignCenter)
-            if fret != 12:
+            if fret in ui.markers['single']:
                 dot.setText(fretMarker)
             else:
                 dot.setText(fretMarker+fretMarker)
@@ -530,7 +530,7 @@ def initialSetup(ui, argv):
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populateFretboard(ui, notes, intervals, ui.frets)
 
-    # Try setting root and type from CLI arguments. 
+    # Try setting root and type from CLI arguments.
     try:
         root = argv[1].capitalize()
         type = argv[2]
@@ -614,7 +614,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
             'tuning':   ui.tuning,
             'strings':  ui.strings,
             'frets':    ui.frets,
-            'title':    MainWindow.windowTitle()
+            'title':    MainWindow.windowTitle(),
+            'markers':  ui.markers,
         }
         print(f"Writing settings to {settingsFile}.")
         writeSettings(settings)
@@ -634,12 +635,17 @@ if __name__ == "__main__":
             ui.strings = settings['strings']
             ui.frets = settings['frets']
             ui.title = settings['title']
+            ui.markers = settings['markers']
     except:
         ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
         ui.tuning = ui.tuning[1:]
         ui.strings = 6
         ui.frets = (0,24)
         ui.title = "Guitar fretboard, scales and chords"
+        ui.markers = {
+            'single':   [3, 5, 7, 9, 15, 17, 19, 21],
+            'double':   [12]
+        }
 
     ui.setupUi(MainWindow, strings=ui.strings)
 

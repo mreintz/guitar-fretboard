@@ -451,7 +451,7 @@ def helpMessage(showWindow):
     if showWindow:
         helpDialog.show()
 
-def initialSetup(ui, argv):
+def initialSetup(ui):
     ui.showChord = False
     ui.showInterval = False
     ui.fretSelected = False
@@ -485,22 +485,12 @@ def initialSetup(ui, argv):
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    #ui.frets = (0,24)
+    ui.frets = (0,24)
     ui.scale = Scale(Note('C'), 'major')
 
     for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
-
-    # Accept CLI arguments to set frets if possible.
-    if len(argv) > 4:
-        try:
-            frets = tuple([int(argv[3]), int(argv[4])])
-            frets = tuple(sorted(frets))
-            if max(frets) <= 24 and min(frets) >= 0:
-                ui.frets = frets
-        except:
-            pass
 
     ui.frets_old = ui.frets
 
@@ -529,6 +519,25 @@ def initialSetup(ui, argv):
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populateFretboard(ui, notes, intervals, ui.frets)
+
+    MainWindow.resize(MainWindow.minimumSizeHint())
+    MainWindow.adjustSize()
+
+    helpMessage(False)  # Just show the prompt in the status bar.
+
+    ui.rootNoteSelector.setFocus()
+    return(True)
+
+def getArgs(argv):
+    # Accept CLI arguments to set frets if possible.
+    if len(argv) > 4:
+        try:
+            frets = tuple([int(argv[3]), int(argv[4])])
+            frets = tuple(sorted(frets))
+            if max(frets) <= 24 and min(frets) >= 0:
+                ui.frets = frets
+        except:
+            pass
 
     # Try setting root and type from CLI arguments.
     try:
@@ -572,13 +581,6 @@ major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pen
             except:
                 print("No valid chord or scale provided, reverting to C major.")
 
-    MainWindow.resize(MainWindow.minimumSizeHint())
-    MainWindow.adjustSize()
-
-    helpMessage(False)  # Just show the prompt in the status bar.
-
-    ui.rootNoteSelector.setFocus()
-    return(True)
 
 def setupHelpDialog(helpDialog):
     helpDialogUi = HelpDialog()
@@ -652,7 +654,9 @@ if __name__ == "__main__":
     MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
     MainWindow.setWindowTitle(ui.title)
 
-    success = initialSetup(ui, sys.argv)
+    success = initialSetup(ui)
+    getArgs(sys.argv)
+
     if success:
         MainWindow.show()
         sys.exit(app.exec_())

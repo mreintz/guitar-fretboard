@@ -8,6 +8,7 @@ import pandas as pd
 from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 import json
+import argparse
 
 settingsFile = "fretboard_settings.json"
 
@@ -528,60 +529,6 @@ def initialSetup(ui):
     ui.rootNoteSelector.setFocus()
     return(True)
 
-def getArgs(argv):
-    # Accept CLI arguments to set frets if possible.
-    if len(argv) > 4:
-        try:
-            frets = tuple([int(argv[3]), int(argv[4])])
-            frets = tuple(sorted(frets))
-            if max(frets) <= 24 and min(frets) >= 0:
-                ui.frets = frets
-        except:
-            pass
-
-    # Try setting root and type from CLI arguments.
-    try:
-        root = argv[1].capitalize()
-        type = argv[2]
-        ui.scale = Scale(Note(root), type)
-        ui.rootNoteSelector.setCurrentText(root)
-        ui.scaleOrChordTypeSelector.setCurrentText(type)
-        print(f"Setting {root} {type} scale.")
-        update()
-    except:
-        try:
-            root = argv[1].capitalize()
-            type = argv[2]
-            ui.chord = Chord(Note(root), type)
-            ui.showChord = True
-            ui.scaleOrChordSlider.setValue(1)
-            ui.scaleOrChordTypeSelector.clear()
-            ui.scaleOrChordTypeSelector.addItems(ui.allChords)
-            ui.rootNoteSelector.setCurrentText(root)
-            ui.scaleOrChordTypeSelector.setCurrentText(type)
-            print(f"Setting {root} {type} chord.")
-            update()
-        except:
-            try:
-                if argv[1] == '--help':
-                    print(
-f"""Syntax: fretboard_app.py <rootnote> <scale or chord type> <fromfret> <tofret>.
-Available rootnotes:
-{", ".join(ui.rootNotes)},
-
-Available scale types:
-maj, min, aug, dim, dom7, min7, maj7, aug7, dim7, m7dim5, sus2, sus4, open5
-
-Available chord types:
-major, natural_minor, harmonic_minor, melodic_minor, major_pentatonic, minor_pentatonic, ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian
-
-""")
-                    return(False)
-
-            except:
-                print("No valid chord or scale provided, reverting to C major.")
-
-
 def setupHelpDialog(helpDialog):
     helpDialogUi = HelpDialog()
     helpDialogUi.setupUi(helpDialog)
@@ -657,8 +604,42 @@ if __name__ == "__main__":
 
     success = initialSetup(ui)
 
-    # Use CLI arguments if available
-    getArgs(sys.argv)
+    parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {ui.allScales} and the available chords are {ui.allChords}.")
+    parser.add_argument('-r', '--rootnote', 
+                        choices=ui.rootNotes, 
+                        default='C',
+                        help="The root note of the scale or chord.")
+    parser.add_argument('-t', '--type', 
+                        choices=ui.allScales+ui.allChords, 
+                        default='major',
+                        help="The type of scale or chord.")
+    parser.add_argument('-ff', '--fromfret', type=int, default=0, help="The first fret of the fret interval.")
+    parser.add_argument('-tf', '--tofret', type=int, default=22, help="The last fret of the fret interval.")
+    parser.add_argument('-p', '--preset', choices=['ukulele', 'guitar', '7-string'], help="Presets for type of instrument. Edit the fretboard_settings.json for more options.")
+    parser.parse_args()
+
+    args = parser.parse_args()
+
+    ui.frets = tuple([args.fromfret, args.tofret])
+    ui.frets = tuple(sorted(ui.frets))
+
+    root = args.rootnote
+    type = args.type
+
+    if type in ui.allScales:
+        ui.scale = Scale(Note(root), type)
+        ui.rootNoteSelector.setCurrentText(root)
+        ui.scaleOrChordTypeSelector.setCurrentText(type)
+    else:
+        ui.chord = Chord(Note(root), type)
+        ui.showChord = True
+        ui.scaleOrChordSlider.setValue(1)
+        ui.scaleOrChordTypeSelector.clear()
+        ui.scaleOrChordTypeSelector.addItems(ui.allChords)
+        ui.rootNoteSelector.setCurrentText(root)
+        ui.scaleOrChordTypeSelector.setCurrentText(type)
+
+    update()
 
     if success:
         MainWindow.show()

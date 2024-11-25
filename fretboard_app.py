@@ -382,7 +382,7 @@ def tuning(string):
         update()
 
 def resetFrets():
-    ui.frets = (0, 24)
+    ui.frets = ui.resetFrets
     update()
     ui.rootNoteSelector.setFocus()
 
@@ -486,7 +486,7 @@ def initialSetup(ui):
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    ui.frets = (0,24)
+    #ui.frets = (0,24)
     ui.scale = Scale(Note('C'), 'major')
 
     for i, t in enumerate(ui.tuningButtons):
@@ -563,6 +563,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             'tuning':   ui.tuning,
             'strings':  ui.strings,
             'frets':    ui.frets,
+            'resetFrets': ui.resetFrets,
             'title':    MainWindow.windowTitle(),
             'markers':  ui.markers,
         }
@@ -586,6 +587,7 @@ if __name__ == "__main__":
             ui.frets = settings['frets']
             ui.title = settings['title']
             ui.markers = settings['markers']
+            ui.resetFrets = settings['resetFrets']
     except:
         ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
         ui.tuning = ui.tuning[1:]
@@ -596,32 +598,79 @@ if __name__ == "__main__":
             'single':   [3, 5, 7, 9, 15, 17, 19, 21],
             'double':   [12]
         }
+        ui.resetFrets = ui.frets        
 
-    ui.setupUi(MainWindow, strings=ui.strings)
-
-    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
-    MainWindow.setWindowTitle(ui.title)
-
-    success = initialSetup(ui)
-
-    parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {ui.allScales} and the available chords are {ui.allChords}.")
+    allScales = [ s for s in Scale.scales.keys() ]
+    allChords = [ c for c in Chord.valid_types ]
+    rootNotes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]    
+    parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {allScales} and the available chords are {allChords}.")
     parser.add_argument('-r', '--rootnote', 
-                        choices=ui.rootNotes, 
+                        choices=rootNotes, 
                         default='C',
                         help="The root note of the scale or chord.")
     parser.add_argument('-t', '--type', 
-                        choices=ui.allScales+ui.allChords, 
+                        choices=allScales+allChords, 
                         default='major',
                         help="The type of scale or chord.")
-    parser.add_argument('-ff', '--fromfret', type=int, default=0, help="The first fret of the fret interval.")
-    parser.add_argument('-tf', '--tofret', type=int, default=22, help="The last fret of the fret interval.")
-    parser.add_argument('-p', '--preset', choices=['ukulele', 'guitar', '7-string'], help="Presets for type of instrument. Edit the fretboard_settings.json for more options.")
+    parser.add_argument('-ff', '--fromfret', type=int, help="The first fret of the fret interval.")
+    parser.add_argument('-tf', '--tofret', type=int, help="The last fret of the fret interval.")
+    parser.add_argument('-p', '--preset', choices=['ukulele', 'guitar', '7-string', 'banjo'], help="Presets for type of instrument. Edit the fretboard_settings.json for more options.")
     parser.parse_args()
 
     args = parser.parse_args()
 
-    ui.frets = tuple([args.fromfret, args.tofret])
-    ui.frets = tuple(sorted(ui.frets))
+    if args.preset:
+        if args.preset == 'ukulele':
+            ui.tuning = ['G', 'C', 'E', 'A']
+            ui.strings = 4
+            ui.frets = (0,17)
+            ui.resetFrets = ui.frets
+            ui.title = "Ukulele"
+            ui.markers = {
+                'single':   [3, 5, 7, 10, 15, 17, 19],
+                'double':   [12]
+            }  
+        elif args.preset == 'guitar':
+            ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+            ui.tuning = ui.tuning[1:]
+            ui.strings = 6
+            ui.frets = (0,24)
+            ui.resetFrets = ui.frets            
+            ui.title = "6-string guitar"
+            ui.markers = {
+                'single':   [3, 5, 7, 9, 15, 17, 19, 21],
+                'double':   [12]
+            }
+        elif args.preset == '7-string':
+            ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+            ui.strings = 7
+            ui.frets = (0,24)
+            ui.resetFrets = ui.frets            
+            ui.title = "7-string guitar"
+            ui.markers = {
+                'single':   [3, 5, 7, 9, 15, 17, 19, 21],
+                'double':   [12]
+            }
+        elif args.preset == 'banjo':
+            ui.tuning = ['G', 'D', 'G', 'B', 'D']
+            ui.strings = 5
+            ui.frets = (0,24)
+            ui.resetFrets = ui.frets            
+            ui.title = "Banjo"
+            ui.markers = {
+                'single':   [3, 5, 7, 10, 15, 17, 19, 22],
+                'double':   [12]
+            }
+
+    ui.setupUi(MainWindow, strings=ui.strings)
+    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
+    MainWindow.setWindowTitle(ui.title)
+    success = initialSetup(ui)
+
+    if ( not args.preset ):
+        if ( args.tofret and args.fromfret):
+            ui.frets = tuple([args.fromfret, args.tofret])
+            ui.frets = tuple(sorted(ui.frets))
 
     root = args.rootnote
     type = args.type

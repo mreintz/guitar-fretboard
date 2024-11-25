@@ -612,8 +612,10 @@ if __name__ == "__main__":
                         choices=allScales+allChords, 
                         default='major',
                         help="The type of scale or chord.")
-    parser.add_argument('-ff', '--fromfret', type=int, help="The first fret of the fret interval.")
-    parser.add_argument('-tf', '--tofret', type=int, help="The last fret of the fret interval.")
+    parser.add_argument('-ff', '--fromfret', type=int, help="The first fret of the fret interval.",
+                        choices=range(1,25))
+    parser.add_argument('-tf', '--tofret', type=int, help="The last fret of the fret interval.",
+                        choices=range(1,25))
     parser.add_argument('-p', '--preset', choices=['ukulele', 'guitar', '7-string', 'banjo'], help="Presets for type of instrument. Edit the fretboard_settings.json for more options.")
     parser.parse_args()
 

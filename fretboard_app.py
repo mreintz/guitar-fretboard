@@ -9,7 +9,8 @@ from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 import json
 import argparse
-import webbrowser
+import os
+import subprocess
 
 settingsFile = "fretboard_settings.json"
 
@@ -532,7 +533,13 @@ def initialSetup(ui):
     return(True)
 
 def editSettings():
-    webbrowser.open(settingsFile)
+    #webbrowser.open(settingsFile)
+    DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    file = os.path.join(__location__, settingsFile)
+    editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
+    subprocess.call([editor, file])
     sys.exit()
 
 def setupHelpDialog(helpDialog):
@@ -605,19 +612,19 @@ if __name__ == "__main__":
             'single':   [3, 5, 7, 9, 15, 17, 19, 21],
             'double':   [12]
         }
-        ui.resetFrets = ui.frets        
+        ui.resetFrets = ui.frets
 
     # Set up and parse CLI arguments
     allScales = [ s for s in Scale.scales.keys() ]
     allChords = [ c for c in Chord.valid_types ]
-    rootNotes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]    
+    rootNotes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]
     parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {allScales} and the available chords are {allChords}.")
-    parser.add_argument('-r', '--rootnote', 
-                        choices=rootNotes, 
+    parser.add_argument('-r', '--rootnote',
+                        choices=rootNotes,
                         default='C',
                         help="The root note of the scale or chord.")
-    parser.add_argument('-t', '--type', 
-                        choices=allScales+allChords, 
+    parser.add_argument('-t', '--type',
+                        choices=allScales+allChords,
                         default='major',
                         help="The type of scale or chord.")
     parser.add_argument('-ff', '--fromfret', type=int, help="The first fret of the fret interval.",
@@ -639,13 +646,13 @@ if __name__ == "__main__":
             ui.markers = {
                 'single':   [3, 5, 7, 10, 15, 17, 19],
                 'double':   [12]
-            }  
+            }
         elif args.preset == 'guitar':
             ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
             ui.tuning = ui.tuning[1:]
             ui.strings = 6
             ui.frets = (0,24)
-            ui.resetFrets = ui.frets            
+            ui.resetFrets = ui.frets
             ui.title = "6-string guitar"
             ui.markers = {
                 'single':   [3, 5, 7, 9, 15, 17, 19, 21],
@@ -655,7 +662,7 @@ if __name__ == "__main__":
             ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
             ui.strings = 7
             ui.frets = (0,24)
-            ui.resetFrets = ui.frets            
+            ui.resetFrets = ui.frets
             ui.title = "7-string guitar"
             ui.markers = {
                 'single':   [3, 5, 7, 9, 15, 17, 19, 21],
@@ -665,7 +672,7 @@ if __name__ == "__main__":
             ui.tuning = ['G', 'D', 'G', 'B', 'D']
             ui.strings = 5
             ui.frets = (0,24)
-            ui.resetFrets = ui.frets            
+            ui.resetFrets = ui.frets
             ui.title = "Banjo"
             ui.markers = {
                 'single':   [3, 5, 7, 10, 15, 17, 19, 22],

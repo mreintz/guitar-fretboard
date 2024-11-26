@@ -11,6 +11,7 @@ import json
 import argparse
 import os
 import subprocess
+import platform
 
 settingsFile = "fretboard_settings.json"
 
@@ -534,7 +535,11 @@ def initialSetup(ui):
 
 def editSettings():
     #webbrowser.open(settingsFile)
-    DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
+    system = platform.system()
+    if system == 'Windows':
+        DEFAULT_EDITOR = 'notepad.exe'
+    else:
+        DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
     file = os.path.join(__location__, settingsFile)

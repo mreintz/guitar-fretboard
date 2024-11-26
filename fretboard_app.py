@@ -534,18 +534,25 @@ def initialSetup(ui):
     return(True)
 
 def editSettings():
-    #webbrowser.open(settingsFile)
-    system = platform.system()
-    if system == 'Windows':
-        DEFAULT_EDITOR = 'notepad.exe'
-    else:
-        DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
-    __location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    file = os.path.join(__location__, settingsFile)
-    editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
-    subprocess.call([editor, file])
-    sys.exit()
+    try:
+        system = platform.system()
+        if system == 'Windows':
+            DEFAULT_EDITOR = 'notepad.exe'
+        else:
+            DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
+        __location__ = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        file = os.path.join(__location__, settingsFile)
+        editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
+        subprocess.call([editor, file])
+    except:
+        import webbrowser
+        webbrowser.open(settingsFile)
+    
+    MainWindow.writeSettings = False
+    helpDialog.hide()
+    sys.exit(app.exec_())
+
 
 def setupHelpDialog(helpDialog):
     helpDialogUi = HelpDialog()
@@ -576,6 +583,7 @@ def writeSettings(settings):
 class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.writeSettings = True
 
     def closeEvent(self, event):
         settings = {
@@ -586,8 +594,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
             'title':    MainWindow.windowTitle(),
             'markers':  ui.markers,
         }
-        print(f"Writing settings to {settingsFile}.")
-        writeSettings(settings)
+        if self.writeSettings:
+            print(f"Writing settings to {settingsFile}.")
+            writeSettings(settings)
+        else:
+            print('Not writing settings to file.')
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

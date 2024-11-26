@@ -9,6 +9,7 @@ from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 import json
 import argparse
+import webbrowser
 
 settingsFile = "fretboard_settings.json"
 
@@ -457,6 +458,7 @@ def initialSetup(ui):
     ui.showChord = False
     ui.showInterval = False
     ui.fretSelected = False
+    ui.resize = False
 
     # List of all the options for Chord() and Scale()
     ui.allScales = [ s for s in Scale.scales.keys() ]
@@ -487,7 +489,6 @@ def initialSetup(ui):
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    #ui.frets = (0,24)
     ui.scale = Scale(Note('C'), 'major')
 
     for i, t in enumerate(ui.tuningButtons):
@@ -530,10 +531,15 @@ def initialSetup(ui):
     ui.rootNoteSelector.setFocus()
     return(True)
 
+def editSettings():
+    webbrowser.open(settingsFile)
+    sys.exit()
+
 def setupHelpDialog(helpDialog):
     helpDialogUi = HelpDialog()
     helpDialogUi.setupUi(helpDialog)
-    helpDialogUi.buttonBox.accepted.connect(helpDialog.hide)
+    helpDialogUi.OKButton.clicked.connect(helpDialog.hide)
+    helpDialogUi.editButton.clicked.connect(editSettings)
 
     for i, row in enumerate(helpMessages):
         text1 = row[0]

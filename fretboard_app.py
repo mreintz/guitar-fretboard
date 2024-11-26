@@ -356,10 +356,11 @@ def update():
         pass
 
     # Resize window if number of frets has changed.
-    if ui.frets_old != ui.frets:
+    if ( (ui.frets_old != ui.frets) or (ui.resize == True) ):
         MainWindow.resize(MainWindow.minimumSizeHint())
         MainWindow.adjustSize()
         ui.frets_old = ui.frets
+        ui.resize = False
 
 def tuning(string):
     # Deal with changes in tuning from one of the tuning peg input boxes.
@@ -600,6 +601,7 @@ if __name__ == "__main__":
         }
         ui.resetFrets = ui.frets        
 
+    # Set up and parse CLI arguments
     allScales = [ s for s in Scale.scales.keys() ]
     allChords = [ c for c in Chord.valid_types ]
     rootNotes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]    
@@ -664,15 +666,18 @@ if __name__ == "__main__":
                 'double':   [12]
             }
 
+    # Initial setup of the UI
     ui.setupUi(MainWindow, strings=ui.strings)
     MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
     MainWindow.setWindowTitle(ui.title)
     success = initialSetup(ui)
 
+    # Set frets from CLI if available
     if ( not args.preset ):
         if ( args.tofret and args.fromfret):
             ui.frets = tuple([args.fromfret, args.tofret])
             ui.frets = tuple(sorted(ui.frets))
+            ui.resize = True
 
     root = args.rootnote
     type = args.type

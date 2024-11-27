@@ -534,25 +534,29 @@ def initialSetup(ui):
     return(True)
 
 def editSettings():
+    helpDialog.hide()
+    MainWindow.hide()
+    MainWindow.writeSettings = False
     try:
         system = platform.system()
         if system == 'Windows':
             DEFAULT_EDITOR = 'notepad.exe'
         else:
-            DEFAULT_EDITOR = '/usr/bin/vi' # backup, if not defined in environment vars
+            DEFAULT_EDITOR = 'editor' # backup, if not defined in environment vars
+
         __location__ = os.path.realpath(
             os.path.join(os.getcwd(), os.path.dirname(__file__)))
         file = os.path.join(__location__, settingsFile)
         editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
         subprocess.call([editor, file])
     except:
-        import webbrowser
-        webbrowser.open(settingsFile)
-    
-    MainWindow.writeSettings = False
-    helpDialog.hide()
-    sys.exit(app.exec_())
-
+        try:
+            import webbrowser
+            webbrowser.open(settingsFile)
+        except:
+            print(f"No default editor found. You need to edit {settingsFile} manually.")
+    finally:
+        sys.exit()
 
 def setupHelpDialog(helpDialog):
     helpDialogUi = HelpDialog()

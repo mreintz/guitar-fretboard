@@ -218,11 +218,15 @@ def populateFretboard(ui, notes, intervals, frets):
                                         f"{interval_colors.get(intervalType, labelColors[6])}"
                                         "border-color : black"
                                         "}")
+        peg.rootNote = text
         peg.setText(translate(text))
 
-def selectRootFromLabel(label):
+def selectRootFromLabel(thing):
+    if isinstance(thing, QLabelClickable):
+        selected = thing.objectName()
+    else:
+        selected = thing.rootNote
     # Set the root note to the note right-clicked.
-    selected = label.objectName()
     if selected in ui.rootNotes:
         ui.rootNoteSelector.setCurrentText(selected)
     else:
@@ -496,6 +500,7 @@ def initialSetup(ui):
     for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
+        t.selected.connect(lambda x=t: selectRootFromLabel(x)) 
 
     ui.frets_old = ui.frets
 

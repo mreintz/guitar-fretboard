@@ -32,9 +32,10 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
 
 class QLineEditTabReact(QtWidgets.QLineEdit):
     def __init__(self, parent):
+        self.rootNote = None
         super().__init__(parent)
 
-    escape = pyqtSignal()
+    escape, selected = [ pyqtSignal() for i in range(2) ]
 
     def event(self,event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
@@ -47,6 +48,16 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
             return True
         else:
             return QtWidgets.QLineEdit.event(self,event)
+
+    def mousePressEvent(self, a0):
+        if a0.button() == Qt.RightButton:
+            self.selected.emit()
+        else:
+            return super().mousePressEvent(a0)
+        
+    def contextMenuEvent(self, event):
+        # Suppress the context menu
+        event.ignore()        
         
 class QLabelClickable(QtWidgets.QLabel):
     def __init__(self, parent, **kwargs):

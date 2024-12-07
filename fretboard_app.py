@@ -226,6 +226,7 @@ def selectRootFromLabel(thing):
         selected = thing.objectName()
     else:
         selected = thing.rootNote
+        
     # Set the root note to the note right-clicked.
     if selected in ui.rootNotes:
         ui.rootNoteSelector.setCurrentText(selected)
@@ -238,6 +239,7 @@ def selectRootFromLabel(thing):
                         ui.rootNoteSelector.setCurrentText(note)
                         break
     changeScaleOrChord()
+    ui.rootNoteSelector.setFocus()
 
 def toggleTransparency(label):
     if not label.transparency:
@@ -444,6 +446,10 @@ def toggle(thing):
     ui.rootNoteSelector.setFocus()
     return
 
+def edit(string):
+    ui.tuningButtons[string].setFocus()
+    ui.tuningButtons[string].selectAll()
+
 def select(thing):
     if thing == 'mode':
         ui.scaleOrChordTypeSelector.setFocus()
@@ -501,6 +507,7 @@ def initialSetup(ui):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
         t.selected.connect(lambda x=t: selectRootFromLabel(x)) 
+        t.edit.connect(lambda string=i: edit(string))
 
     ui.frets_old = ui.frets
 

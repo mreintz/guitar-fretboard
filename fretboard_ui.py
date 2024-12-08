@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, strings=...):
@@ -50,7 +50,7 @@ class Ui_MainWindow(object):
 
         self.tuningButtons.reverse()            
 
-        self.nutButton = QtWidgets.QPushButton(self.centralwidget)
+        self.nutButton = QPushButtonRightClick(self.centralwidget)
         self.nutButton.setMinimumSize(QtCore.QSize(40, 40))
         self.nutButton.setMaximumSize(QtCore.QSize(40, 40))
         font = QtGui.QFont()
@@ -155,9 +155,8 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.titleLabel.setText(_translate("MainWindow", "C major scale: C  D  E  F  G  A  B"))
-        self.nutButton.setText(_translate("MainWindow", "N"))
+        self.nutButton.setText(_translate("MainWindow", "N/?"))
         self.label_2.setText(_translate("MainWindow", "Notes"))
         self.label_3.setText(_translate("MainWindow", "Intervals"))
         self.label_4.setText(_translate("MainWindow", "Scale"))
         self.label_5.setText(_translate("MainWindow", "Chord"))
-from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact

@@ -446,7 +446,7 @@ def toggle(thing):
     ui.rootNoteSelector.setFocus()
     return
 
-def edit(string):
+def editTuningPeg(string):
     ui.tuningButtons[string].setFocus()
     ui.tuningButtons[string].selectAll()
 
@@ -465,6 +465,7 @@ def helpMessage(showWindow):
     ui.statusbar.showMessage("Press '?' to see list of commands and hotkeys.", 100000)
     if showWindow:
         helpDialog.show()
+    select('root')
 
 def initialSetup(ui):
     ui.showChord = False
@@ -480,6 +481,7 @@ def initialSetup(ui):
     ui.notesOrIntervalsSlider.valueChanged['int'].connect(update)
     ui.scaleOrChordSlider.valueChanged['int'].connect(update)
     ui.nutButton.clicked.connect(resetFrets)
+    ui.nutButton.rightClicked.connect(lambda window=True: helpMessage(window))
     ui.rootNoteSelector.activated.connect(changeScaleOrChord)
     ui.scaleOrChordTypeSelector.activated.connect(changeScaleOrChord)
 
@@ -507,7 +509,7 @@ def initialSetup(ui):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
         t.selected.connect(lambda x=t: selectRootFromLabel(x)) 
-        t.edit.connect(lambda string=i: edit(string))
+        t.edit.connect(lambda string=i: editTuningPeg(string))
 
     ui.frets_old = ui.frets
 

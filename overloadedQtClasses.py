@@ -71,3 +71,15 @@ class QLabelClickable(QtWidgets.QLabel):
             self.selected.emit()
         else:
             self.clicked.emit()
+
+class QPushButtonRightClick(QtWidgets.QPushButton):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+
+    rightClicked = pyqtSignal()
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.RightButton:
+            self.rightClicked.emit()
+        else:
+            return super().mousePressEvent(e)

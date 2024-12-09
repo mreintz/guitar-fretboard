@@ -116,7 +116,8 @@ def populateFretboard(ui, notes, intervals, frets):
                 label.setAlignment(QtCore.Qt.AlignCenter)
                 label.setFrameShape(QtWidgets.QFrame.Box)
                 label.setLineWidth(3)
-                label.setToolTip('Left click to toggle transparency, right click to set root note.')
+                if ui.tooltip:
+                    label.setToolTip('Left click to toggle transparency, right click to set root note.')
                 if ui.showInterval:
                     interval =  label.objectName()
                     if interval != "P1":
@@ -169,7 +170,8 @@ def populateFretboard(ui, notes, intervals, frets):
             button.setObjectName("fretButton" + str(fret))
             button.setText(str(fret))
             button.setFocusPolicy(QtCore.Qt.ClickFocus)
-            button.setToolTip('Click two fret buttons to set the portion of fretboard to view.')
+            if ui.tooltip:
+                button.setToolTip('Click two fret buttons to set the portion of fretboard to view.')
             ui.gridLayout.addWidget(button, ui.strings, 2*j+1, 1, 1)
             ui.fretButtons.append(button)
             button.clicked.connect(lambda state, x=fret: setFret(x))
@@ -669,6 +671,7 @@ if __name__ == "__main__":
     parser.add_argument('-tf', '--tofret', type=int, help="The last fret of the fret interval.",
                         choices=range(1,25))
     parser.add_argument('-p', '--preset', choices=['ukulele', 'guitar', '7-string', 'banjo'], help="Presets for type of instrument. Edit the fretboard_settings.json for more options.")
+    parser.add_argument('--notooltip', action='store_true', help="Turns off tooltips.")
     parser.parse_args()
 
     args = parser.parse_args()
@@ -716,8 +719,10 @@ if __name__ == "__main__":
                 'double':   [12]
             }
 
+    ui.tooltip = not args.notooltip
+
     # Initial setup of the UI
-    ui.setupUi(MainWindow, strings=ui.strings)
+    ui.setupUi(MainWindow, ui.tooltip, strings=ui.strings)
     MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
     MainWindow.setWindowTitle(ui.title)
     success = initialSetup(ui)

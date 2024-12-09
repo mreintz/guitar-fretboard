@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow, strings=...):
+    def setupUi(self, MainWindow, tooltip, strings=...):
         if strings==...:
             strings=6
         self.strings=strings
@@ -46,7 +46,8 @@ class Ui_MainWindow(object):
             font.setPointSize(12)
             button.setFont(font)
             button.setAlignment(QtCore.Qt.AlignCenter)
-            button.setToolTip('Left click to change tuning, right click to set root note.')
+            if tooltip:
+                button.setToolTip('Left click to change tuning, right click to set root note.')
             self.gridLayout.addWidget(button, i, 0, 1, 1)
 
         self.tuningButtons.reverse()            
@@ -58,7 +59,8 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.nutButton.setFont(font)
         self.nutButton.setObjectName("nutButton")
-        self.nutButton.setToolTip('Left click to revert to full fretboard, right click for help.')
+        if tooltip:
+            self.nutButton.setToolTip('Left click to revert to full fretboard, right click for help.')
         self.gridLayout.addWidget(self.nutButton, strings, 0, 1, 1)
 
         self.verticalLayout.addLayout(self.gridLayout)
@@ -77,7 +79,8 @@ class Ui_MainWindow(object):
         self.notesOrIntervalsSlider = QtWidgets.QSlider(self.centralwidget)
         self.notesOrIntervalsSlider.setMaximum(1)
         self.notesOrIntervalsSlider.setPageStep(1)
-        self.notesOrIntervalsSlider.setToolTip('Display notes or intervals?')
+        if tooltip:
+            self.notesOrIntervalsSlider.setToolTip('Display notes or intervals?')
         self.notesOrIntervalsSlider.setOrientation(QtCore.Qt.Horizontal)
         self.notesOrIntervalsSlider.setObjectName("notesOrIntervalsSlider")
         self.horizontalLayout.addWidget(self.notesOrIntervalsSlider)
@@ -104,7 +107,8 @@ class Ui_MainWindow(object):
         self.scaleOrChordSlider = QtWidgets.QSlider(self.centralwidget)
         self.scaleOrChordSlider.setMaximum(1)
         self.scaleOrChordSlider.setPageStep(1)
-        self.scaleOrChordSlider.setToolTip('Display scale or chord?')
+        if tooltip:
+            self.scaleOrChordSlider.setToolTip('Display scale or chord?')
         self.scaleOrChordSlider.setOrientation(QtCore.Qt.Horizontal)
         self.scaleOrChordSlider.setObjectName("scaleOrChordSlider")
         self.horizontalLayout_2.addWidget(self.scaleOrChordSlider)
@@ -127,14 +131,16 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         self.rootNoteSelector.setFont(font)
         self.rootNoteSelector.setObjectName("rootNoteSelector")
-        self.rootNoteSelector.setToolTip('Select root note of the scale or chord.')
+        if tooltip:
+            self.rootNoteSelector.setToolTip('Select root note of the scale or chord.')
         self.horizontalLayout_3.addWidget(self.rootNoteSelector)
         self.scaleOrChordTypeSelector = QComboBoxWithKeyEvents(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.scaleOrChordTypeSelector.setFont(font)
         self.scaleOrChordTypeSelector.setObjectName("scaleOrChordTypeSelector")
-        self.scaleOrChordTypeSelector.setToolTip('Select type of scale or chord.')
+        if tooltip:
+            self.scaleOrChordTypeSelector.setToolTip('Select type of scale or chord.')
         self.horizontalLayout_3.addWidget(self.scaleOrChordTypeSelector)
         self.horizontalLayout_4.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_4.setStretch(4, 10)

@@ -24,7 +24,8 @@ helpMessages = [
     ['Fret buttons',    'Click to zoom in on frets'],
     ['Left click', 'Set/unset transparency on a note/interval'],
     ['Right click', 'Set root note to the note below the cursor'],
-    ['?',       'Display this message']
+    ['?',       'Display this message'],
+    ['', ''],
 ]
 
 
@@ -115,6 +116,7 @@ def populateFretboard(ui, notes, intervals, frets):
                 label.setAlignment(QtCore.Qt.AlignCenter)
                 label.setFrameShape(QtWidgets.QFrame.Box)
                 label.setLineWidth(3)
+                label.setToolTip('Left click to toggle transparency, right click to set root note.')
                 if ui.showInterval:
                     interval =  label.objectName()
                     if interval != "P1":
@@ -167,6 +169,7 @@ def populateFretboard(ui, notes, intervals, frets):
             button.setObjectName("fretButton" + str(fret))
             button.setText(str(fret))
             button.setFocusPolicy(QtCore.Qt.ClickFocus)
+            button.setToolTip('Click two fret buttons to set the portion of fretboard to view.')
             ui.gridLayout.addWidget(button, ui.strings, 2*j+1, 1, 1)
             ui.fretButtons.append(button)
             button.clicked.connect(lambda state, x=fret: setFret(x))

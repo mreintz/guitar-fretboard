@@ -1,21 +1,21 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-from fretboard_ui import Ui_MainWindow
-from fretboard import Fretboard
-import fretboard_rc
-from musthe import *
-import sys
-import pandas as pd
-from overloadedQtClasses import QLabelClickable
-from helpDialog import HelpDialog
 import json
 import argparse
 import os
 import subprocess
 import platform
+import sys
+from musthe import Note, Chord, Scale
+import pandas as pd
+from PyQt5 import QtWidgets, QtCore, QtGui
+from fretboard_ui import Ui_MainWindow
+from fretboard import Fretboard
+from overloadedQtClasses import QLabelClickable
+from helpDialog import HelpDialog
+import fretboard_rc
 
-settingsFile = "fretboard_settings.json"
+SETTINGSFILE = "fretboard_settings.json"
 
-helpMessages = [
+HELP_MESSAGES = [
     ['<space>', 'Toggle between scale and chord'],
     ['I',       'Show notes or (I)ntervals'],
     ['N',       'Revert number of frets to (N)ormal'],
@@ -28,17 +28,22 @@ helpMessages = [
     ['', ''],
 ]
 
+def eighteen_rule():
+    """Create fret widths according to the 'rule of eighteen'."""
+    global fretWidths
 
-fullFretboard = 2000
-firstFret = fullFretboard / 18
-remaining = fullFretboard - firstFret
-fretWidths = [round(firstFret)]
-for i in range(25):
-    nextFret = remaining/18
-    remaining = remaining - nextFret
-    fretWidths.append(round(nextFret))
+    full_fretboard = 2000
+    first_fret = full_fretboard / 18
+    remaining = full_fretboard - first_fret
+    fretWidths = [round(first_fret)]
+    for i in range(25):
+        next_fret = remaining/18
+        remaining = remaining - next_fret
+        fretWidths.append(round(next_fret))
 
-labelColors = [
+eighteen_rule()
+
+LABEL_COLORS = [
     "background-color: rgba(205, 253, 205, 80%);",
     "background-color: rgba(147, 223, 199, 80%);",
     "background-color: rgba(173, 215, 229, 80%);",
@@ -48,16 +53,16 @@ labelColors = [
     "background-color: rgba(217, 170, 174, 80%);"
 ]
 
-interval_colors = {
+INTERVAL_COLORS = {
     'm':        "background-color: lightBlue; color: black;",   #labelColors[2],
     'M':        "background-color: lightGreen; color: black;",  #labelColors[0],
-    'd':        labelColors[6],
+    'd':        LABEL_COLORS[6],
     'P':        "background-color: yellow; color: black;",       #"background-color: rgba(220, 220, 170, 80%);",  #labelColors[0],
-    'A':        labelColors[5],
+    'A':        LABEL_COLORS[5],
     'P1':       "background-color: red; color: white; border-color: black;"
 }
 
-replacementStrings = {
+REPLACEMENT_STRINGS = {
     'dim ':  'diminished ',
     '_':    ' ',
     'min ':  'minor ',
@@ -66,12 +71,13 @@ replacementStrings = {
 }
 
 def translate(string):
+    """Translate to ascii characters for flats and sharps."""
     string=string.replace('b', '♭')
     string=string.replace('#', '♯')
     return string
 
-def populateFretboard(ui, notes, intervals, frets):
-    # Set up all the labels with notes or intervals on them
+def populate_fretboard(ui, notes, intervals, frets):
+    """Set up all the labels with notes or intervals on them"""
     ui.labels = []
     if ui.showInterval:
         fretboard = intervals
@@ -86,11 +92,11 @@ def populateFretboard(ui, notes, intervals, frets):
 
     # Setting up the labels...
     for i, row in enumerate(fretboard):
-        labelRow = []
+        label_row = []
         for j, column in enumerate(row, start=1):
             label = QLabelClickable(ui.centralwidget, text=translate(column))
-            label.clicked.connect(lambda x=label: toggleTransparency(x))
-            label.selected.connect(lambda x=label: selectRootFromLabel(x))
+            label.clicked.connect(lambda x=label: toggle_transparency(x))
+            label.selected.connect(lambda x=label: select_root_from_label(x))
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setObjectName(column)
@@ -98,16 +104,16 @@ def populateFretboard(ui, notes, intervals, frets):
             font.setPointSize(12)
             label.setFont(font)
             ui.gridLayout.addWidget(label, i, 2*j+1, 1, 1)
-            labelRow.append(label)
-        ui.labels.append(labelRow)
+            label_row.append(label)
+        ui.labels.append(label_row)
 
     # "Flatten" the notes and intervals into a single list for easy lookup.
-    flattenedNotes = []
-    flattenedIntervals = []
+    flattened_notes = []
+    flattened_intervals = []
     for row in notes:
-        flattenedNotes += row
+        flattened_notes += row
     for row in intervals:
-        flattenedIntervals += row
+        flattened_intervals += row
 
     # Setting up the colors corresponding to the intervals.
     for row in ui.labels:
@@ -126,7 +132,7 @@ def populateFretboard(ui, notes, intervals, frets):
                         intervalType = interval
                 else:
                     try:
-                        interval = flattenedIntervals[flattenedNotes.index(label.objectName())]
+                        interval = flattened_intervals[flattened_notes.index(label.objectName())]
                         if interval != "P1":
                             intervalType = interval[0]
                         else:
@@ -136,7 +142,7 @@ def populateFretboard(ui, notes, intervals, frets):
                 label.setStyleSheet("QLabel"
                             "{"
                             "border : 3px solid ;"
-                            f"{interval_colors.get(intervalType, labelColors[6])}"
+                            f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
                             "border-color : black"
                             "}")
 
@@ -155,7 +161,7 @@ def populateFretboard(ui, notes, intervals, frets):
         i = i + 1
 
     # Set up the fret buttons.
-    fretMarker = "●"
+    fret_marker = "●"
     ui.fretMarkers = []
     ui.fretButtons = []
     j = 1
@@ -174,15 +180,15 @@ def populateFretboard(ui, notes, intervals, frets):
                 button.setToolTip('Click two fret buttons to set the portion of fretboard to view.')
             ui.gridLayout.addWidget(button, ui.strings, 2*j+1, 1, 1)
             ui.fretButtons.append(button)
-            button.clicked.connect(lambda state, x=fret: setFret(x))
+            button.clicked.connect(lambda state, x=fret: set_fret(x))
             j = j + 1
         if fret in ( ui.markers['single'] + ui.markers['double'] ):
             dot = QtWidgets.QLabel(ui.centralwidget, text=translate(column))
             dot.setAlignment(QtCore.Qt.AlignCenter)
             if fret in ui.markers['single']:
-                dot.setText(fretMarker)
+                dot.setText(fret_marker)
             else:
-                dot.setText(fretMarker+fretMarker)
+                dot.setText(fret_marker+fret_marker)
             ui.gridLayout.addWidget(dot, ui.strings+1, 2*j-1, 1, 1)
             ui.fretMarkers.append(dot)
 
@@ -192,7 +198,7 @@ def populateFretboard(ui, notes, intervals, frets):
         peg.setStyleSheet("QLineEdit")
 
         try:
-            interval = flattenedIntervals[flattenedNotes.index(text)]
+            interval = flattened_intervals[flattened_notes.index(text)]
             if interval != "P1":
                 intervalType = interval[0]
             else:
@@ -206,13 +212,13 @@ def populateFretboard(ui, notes, intervals, frets):
                     peg.setStyleSheet("QLineEdit"
                                 "{"
                                 "border : 3px solid ;"
-                                f"{interval_colors.get(intervalType, labelColors[6])}"
+                                f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
                                 "border-color : black"
                                 "}")
                 else:
                     for enharmonicRow in ui.enharmonics:
                         if (text in enharmonicRow and note in enharmonicRow):
-                            interval = flattenedIntervals[flattenedNotes.index(note)]
+                            interval = flattened_intervals[flattened_notes.index(note)]
                             if interval != "P1":
                                 intervalType = interval[0]
                             else:
@@ -220,13 +226,14 @@ def populateFretboard(ui, notes, intervals, frets):
                             peg.setStyleSheet("QLineEdit"
                                         "{"
                                         "border : 3px solid ;"
-                                        f"{interval_colors.get(intervalType, labelColors[6])}"
+                                        f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
                                         "border-color : black"
                                         "}")
         peg.rootNote = text
         peg.setText(translate(text))
 
-def selectRootFromLabel(thing):
+def select_root_from_label(thing):
+    """Selects root note from label click."""
     if isinstance(thing, QLabelClickable):
         selected = thing.objectName()
     else:
@@ -243,10 +250,11 @@ def selectRootFromLabel(thing):
                     if note in ui.rootNotes:
                         ui.rootNoteSelector.setCurrentText(note)
                         break
-    changeScaleOrChord()
+    change_scale_or_chord()
     ui.rootNoteSelector.setFocus()
 
-def toggleTransparency(label):
+def toggle_transparency(label):
+    """Toggle the transparency of a label."""
     if not label.transparency:
         ui.opacity_effect = QtWidgets.QGraphicsOpacityEffect()
         ui.opacity_effect.setOpacity(0.3)
@@ -256,8 +264,8 @@ def toggleTransparency(label):
     label.setGraphicsEffect(ui.opacity_effect)
     label.transparency = not label.transparency
 
-def setFret(fret):
-    # Set new fret selection
+def set_fret(fret):
+    """Set new fret selection."""
     if not ui.fretSelected:
         # Is this the first or the second fret selected in the range?
         ui.fretSelected = True
@@ -269,7 +277,7 @@ def setFret(fret):
                     index = index - 1
                 row[index].setStyleSheet("QLabel"
                     "{"
-                    f"{interval_colors['m']}"
+                    f"{INTERVAL_COLORS['m']}"
                     "}")
                 ui.statusbar.showMessage("Click the next fret to zoom in on the fretboard.", 10000)
             except IndexError:
@@ -290,13 +298,14 @@ def setFret(fret):
 
     ui.rootNoteSelector.setFocus()
 
-def clearFromGrid(widget):
+def clear_from_grid(widget):
+    """Clear a widget from the grid."""
     ui.gridLayout.removeWidget(widget)
     widget.setParent(None)
     widget.deleteLater()
 
 def update():
-    # Updates the GUI.
+    """Updates the GUI."""
     # Track if we are switching between chord and scale or not.
     showChord_old = ui.showChord
     ui.showChord = ui.scaleOrChordSlider.value()
@@ -326,19 +335,19 @@ def update():
     # Re-build the labels. First remove the old ones.
     for row in ui.labels:
         for label in row:
-            clearFromGrid(label)
+            clear_from_grid(label)
 
     # Remove the buttons as well.
     for button in ui.fretButtons:
-        clearFromGrid(button)
+        clear_from_grid(button)
 
     # And the fret lines:
     for line in ui.lines:
-        clearFromGrid(line)
+        clear_from_grid(line)
 
     # And the dots:
     for dot in ui.fretMarkers:
-        clearFromGrid(dot)
+        clear_from_grid(dot)
 
     # Generate the new notes and intervals.
     f = Fretboard(tuning=ui.tuning)
@@ -348,7 +357,7 @@ def update():
         notes, intervals = f.build(scale=ui.scale, frets=ui.frets)
 
     # Generate and populate the new fretboard.
-    populateFretboard(ui, notes, intervals, ui.frets)
+    populate_fretboard(ui, notes, intervals, ui.frets)
 
     # Show the notes in the chord or scale in the title label.
     if ui.showChord:
@@ -363,21 +372,21 @@ def update():
     ui.titleLabel.setText(f"{translate(ui.rootNoteSelector.currentText())} {ui.scaleOrChordTypeSelector.currentText()} {type}: {translate(notesString)}") # {translate(intervalsString)}")
     title = ui.titleLabel.text()
     try:
-        for string in replacementStrings.keys():
-            title = title.replace(string, replacementStrings[string])
+        for string in REPLACEMENT_STRINGS.keys():
+            title = title.replace(string, REPLACEMENT_STRINGS[string])
         ui.titleLabel.setText(title)
     except:
         pass
 
     # Resize window if number of frets has changed.
     if ( (ui.frets_old != ui.frets) or (ui.resize == True) ):
-        MainWindow.resize(MainWindow.minimumSizeHint())
-        MainWindow.adjustSize()
+        main_window.resize(main_window.minimumSizeHint())
+        main_window.adjustSize()
         ui.frets_old = ui.frets
         ui.resize = False
 
 def tuning(string):
-    # Deal with changes in tuning from one of the tuning peg input boxes.
+    """Deal with changes in tuning from one of the tuning peg input boxes."""
     old = ui.tuning[string]
     ui.tuningButtons[string].setText(ui.tuningButtons[string].text().capitalize())
     new = ui.tuningButtons[string].text()
@@ -396,13 +405,14 @@ def tuning(string):
         ui.statusbar.showMessage(f"Tuning is now {''.join(ui.tuning)}", 10000)
         update()
 
-def resetFrets():
+def reset_frets():
+    """Reset the frets to the number specified in the model for the instrument."""
     ui.frets = ui.resetFrets
     update()
     ui.rootNoteSelector.setFocus()
 
-def changeScaleOrChord():
-    # Change from scale to chord or back.
+def change_scale_or_chord():
+    """Change from scale to chord or back."""
     try:
         delattr(ui, chord)
     except NameError:
@@ -422,6 +432,7 @@ def changeScaleOrChord():
     update()
 
 def toggle(thing):
+    """Method to toggle several switches."""
     if thing == 'intervals':
         if ui.notesOrIntervalsSlider.value() == 1:
             ui.notesOrIntervalsSlider.setValue(0)
@@ -436,26 +447,27 @@ def toggle(thing):
         if ui.scaleOrChordSlider.value() == 1:
             if 'maj' in ui.scaleOrChordTypeSelector.currentText():
                 ui.scaleOrChordTypeSelector.setCurrentText('min')
-                changeScaleOrChord()
+                change_scale_or_chord()
             else:
                 ui.scaleOrChordTypeSelector.setCurrentText('maj')
-                changeScaleOrChord()
+                change_scale_or_chord()
         else:
             if ('major' in ui.scaleOrChordTypeSelector.currentText()) or (ui.scaleOrChordTypeSelector.currentText() == 'ionian'):
                 ui.scaleOrChordTypeSelector.setCurrentText('natural_minor')
-                changeScaleOrChord()
+                change_scale_or_chord()
             else:
                 ui.scaleOrChordTypeSelector.setCurrentText('major')
-                changeScaleOrChord()
+                change_scale_or_chord()
 
     ui.rootNoteSelector.setFocus()
-    return
 
-def editTuningPeg(string):
+def edit_tuning_peg(string):
+    """Start editing from the topmost string."""
     ui.tuningButtons[string].setFocus()
     ui.tuningButtons[string].selectAll()
 
 def select(thing):
+    """Method to select different widgets."""
     if thing == 'mode':
         ui.scaleOrChordTypeSelector.setFocus()
     elif thing == 'root':
@@ -466,13 +478,15 @@ def select(thing):
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning, Esc to return.", 10000)
     return
 
-def helpMessage(showWindow):
+def help_message(show_window):
+    """Displays help message in statusbar, optionally in separate window."""
     ui.statusbar.showMessage("Press '?' to see list of commands and hotkeys.", 100000)
-    if showWindow:
-        helpDialog.show()
+    if show_window:
+        help_dialog.show()
     select('root')
 
-def initialSetup(ui):
+def initial_setup(ui):
+    """Initial setup of the UI."""
     ui.showChord = False
     ui.showInterval = False
     ui.fretSelected = False
@@ -485,26 +499,26 @@ def initialSetup(ui):
 
     ui.notesOrIntervalsSlider.valueChanged['int'].connect(update)
     ui.scaleOrChordSlider.valueChanged['int'].connect(update)
-    ui.nutButton.clicked.connect(resetFrets)
-    ui.nutButton.rightClicked.connect(lambda window=True: helpMessage(window))
-    ui.rootNoteSelector.activated.connect(changeScaleOrChord)
-    ui.scaleOrChordTypeSelector.activated.connect(changeScaleOrChord)
+    ui.nutButton.clicked.connect(reset_frets)
+    ui.nutButton.rightClicked.connect(lambda window=True: help_message(window))
+    ui.rootNoteSelector.activated.connect(change_scale_or_chord)
+    ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
 
     ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
-    ui.rootNoteSelector.nut.connect(resetFrets)
+    ui.rootNoteSelector.nut.connect(reset_frets)
     ui.rootNoteSelector.mode.connect(lambda thing='mode': select(thing))
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
-    ui.rootNoteSelector.help.connect(lambda window=True: helpMessage(window))
+    ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
-    ui.scaleOrChordTypeSelector.nut.connect(resetFrets)
+    ui.scaleOrChordTypeSelector.nut.connect(reset_frets)
     ui.scaleOrChordTypeSelector.root.connect(lambda thing='root': select(thing))
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
-    ui.scaleOrChordTypeSelector.help.connect(helpMessage)
+    ui.scaleOrChordTypeSelector.help.connect(lambda window=True: help_message(window))
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 
@@ -513,8 +527,8 @@ def initialSetup(ui):
     for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
-        t.selected.connect(lambda x=t: selectRootFromLabel(x)) 
-        t.edit.connect(lambda string=i: editTuningPeg(string))
+        t.selected.connect(lambda x=t: select_root_from_label(x)) 
+        t.edit.connect(lambda string=i: edit_tuning_peg(string))
 
     ui.frets_old = ui.frets
 
@@ -542,20 +556,21 @@ def initialSetup(ui):
                  'B',]
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
-    populateFretboard(ui, notes, intervals, ui.frets)
+    populate_fretboard(ui, notes, intervals, ui.frets)
 
-    MainWindow.resize(MainWindow.minimumSizeHint())
-    MainWindow.adjustSize()
+    main_window.resize(main_window.minimumSizeHint())
+    main_window.adjustSize()
 
-    helpMessage(False)  # Just show the prompt in the status bar.
+    help_message(False)  # Just show the prompt in the status bar.
 
     ui.rootNoteSelector.setFocus()
     return(True)
 
-def editSettings():
-    helpDialog.hide()
-    MainWindow.hide()
-    MainWindow.writeSettings = False
+def edit_settings():
+    """Edit the settings file."""
+    help_dialog.hide()
+    main_window.hide()
+    main_window.writeSettings = False
     try:
         system = platform.system()
         if system == 'Windows':
@@ -565,45 +580,48 @@ def editSettings():
 
         __location__ = os.path.realpath(
             os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        file = os.path.join(__location__, settingsFile)
+        file = os.path.join(__location__, SETTINGSFILE)
         editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
         subprocess.call([editor, file])
     except:
         try:
             import webbrowser
-            webbrowser.open(settingsFile)
+            webbrowser.open(SETTINGSFILE)
         except:
-            print(f"No default editor found. You need to edit {settingsFile} manually.")
+            print(f"No default editor found. You need to edit {SETTINGSFILE} manually.")
     finally:
         sys.exit()
 
-def setupHelpDialog(helpDialog):
+def setup_help_dialog(help_dialog):
+    """Sets up the help dialog."""
     helpDialogUi = HelpDialog()
-    helpDialogUi.setupUi(helpDialog)
-    helpDialogUi.OKButton.clicked.connect(helpDialog.hide)
-    helpDialogUi.editButton.clicked.connect(editSettings)
+    helpDialogUi.setupUi(help_dialog)
+    helpDialogUi.OKButton.clicked.connect(help_dialog.hide)
+    helpDialogUi.editButton.clicked.connect(edit_settings)
 
-    for i, row in enumerate(helpMessages):
+    for i, row in enumerate(HELP_MESSAGES):
         text1 = row[0]
         text2 = row[1]
-        label1, label2 = [ QtWidgets.QLabel(helpDialog) for i in range(2) ]
+        label1, label2 = [ QtWidgets.QLabel(help_dialog) for i in range(2) ]
         label1.setText(text1)
         label1.setAlignment(QtCore.Qt.AlignCenter)
         label2.setText(text2)
         helpDialogUi.gridLayout.addWidget(label1, i, 0, 1, 1)
         helpDialogUi.gridLayout.addWidget(label2, i, 1, 1, 1)
 
-    helpDialog.setWindowTitle("Commands and hotkeys")
-    helpDialog.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
-    helpDialog.resize(helpDialog.minimumSizeHint())
-    helpDialog.adjustSize()
-    helpDialog.hide()
+    help_dialog.setWindowTitle("Commands and hotkeys")
+    help_dialog.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
+    help_dialog.resize(help_dialog.minimumSizeHint())
+    help_dialog.adjustSize()
+    help_dialog.hide()
 
-def writeSettings(settings):
-    with open(settingsFile, 'w') as f:
+def write_settings(settings):
+    """Write settings to file."""
+    with open(SETTINGSFILE, 'w') as f:
         json.dump(settings, f)
 
 class MyMainWindow(QtWidgets.QMainWindow):
+    """Extended class for the main window."""
     def __init__(self):
         super().__init__()
         self.writeSettings = True
@@ -614,26 +632,26 @@ class MyMainWindow(QtWidgets.QMainWindow):
             'strings':  ui.strings,
             'frets':    ui.frets,
             'resetFrets': ui.resetFrets,
-            'title':    MainWindow.windowTitle(),
+            'title':    main_window.windowTitle(),
             'markers':  ui.markers,
         }
         if self.writeSettings:
-            print(f"Writing settings to {settingsFile}.")
-            writeSettings(settings)
+            print(f"Writing settings to {SETTINGSFILE}.")
+            write_settings(settings)
         else:
             print('Not writing settings to file.')
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = MyMainWindow()
+    main_window = MyMainWindow()
 
-    helpDialog = QtWidgets.QDialog()
-    setupHelpDialog(helpDialog)
+    help_dialog = QtWidgets.QDialog()
+    setup_help_dialog(help_dialog)
     ui = Ui_MainWindow()
 
     # First load settings from file if available
     try:
-        with open(settingsFile, 'r') as f:
+        with open(SETTINGSFILE, 'r') as f:
             settings = json.load(f)
             ui.tuning = settings['tuning']
             ui.strings = settings['strings']
@@ -654,16 +672,16 @@ if __name__ == "__main__":
         ui.resetFrets = ui.frets
 
     # Set up and parse CLI arguments
-    allScales = [ s for s in Scale.scales.keys() ]
-    allChords = [ c for c in Chord.valid_types ]
-    rootNotes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]
-    parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {allScales} and the available chords are {allChords}.")
+    all_scales = [ s for s in Scale.scales.keys() ]
+    all_chords = [ c for c in Chord.valid_types ]
+    root_notes = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B',]
+    parser = argparse.ArgumentParser(description=f"Select rootnote and type for the scale or chord, as well as other parameters as listed below. The available scales are {all_scales} and the available chords are {all_chords}.")
     parser.add_argument('-r', '--rootnote',
-                        choices=rootNotes,
+                        choices=root_notes,
                         default='C',
                         help="The root note of the scale or chord.")
     parser.add_argument('-t', '--type',
-                        choices=allScales+allChords,
+                        choices=all_scales+all_chords,
                         default='major',
                         help="The type of scale or chord.")
     parser.add_argument('-ff', '--fromfret', type=int, help="The first fret of the fret interval.",
@@ -722,10 +740,10 @@ if __name__ == "__main__":
     ui.tooltip = not args.notooltip
 
     # Initial setup of the UI
-    ui.setupUi(MainWindow, ui.tooltip, strings=ui.strings)
-    MainWindow.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
-    MainWindow.setWindowTitle(ui.title)
-    success = initialSetup(ui)
+    ui.setupUi(main_window, ui.tooltip, strings=ui.strings)
+    main_window.setWindowIcon(QtGui.QIcon(":/icons/guitar.png"))
+    main_window.setWindowTitle(ui.title)
+    success = initial_setup(ui)
 
     # Set frets from CLI if available
     if ( not args.preset ):
@@ -753,7 +771,7 @@ if __name__ == "__main__":
     update()
 
     if success:
-        MainWindow.show()
+        main_window.show()
         sys.exit(app.exec_())
     else:
         sys.exit()

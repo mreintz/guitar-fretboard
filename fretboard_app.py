@@ -13,7 +13,9 @@ from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 import fretboard_rc
 
-SETTINGSFILE = "fretboard_settings.json"
+SETTINGSFILENAME = "fretboard_settings.json"
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+SETTINGSFILE = os.path.join(__location__, SETTINGSFILENAME)
 
 HELP_MESSAGES = [
     ['<space>', 'Toggle between scale and chord'],
@@ -578,11 +580,9 @@ def edit_settings():
         else:
             DEFAULT_EDITOR = 'editor' # backup, if not defined in environment vars
 
-        __location__ = os.path.realpath(
-            os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        file = os.path.join(__location__, SETTINGSFILE)
+        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
-        subprocess.call([editor, file])
+        subprocess.call([editor, SETTINGSFILE])
     except:
         try:
             import webbrowser
@@ -617,9 +617,7 @@ def setup_help_dialog(help_dialog):
 
 def write_settings(settings):
     """Write settings to file."""
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    file = os.path.join(__location__, SETTINGSFILE)
-    with open(file, 'w') as f:
+    with open(SETTINGSFILE, 'w') as f:
         json.dump(settings, f)
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -638,7 +636,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             'markers':  ui.markers,
         }
         if self.writeSettings:
-            print(f"Writing settings to {SETTINGSFILE}.")
+            print(f"Writing settings to {SETTINGSFILENAME}.")
             write_settings(settings)
         else:
             print('Not writing settings to file.')
@@ -653,9 +651,7 @@ if __name__ == "__main__":
 
     # First load settings from file if available
     try:
-        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        file = os.path.join(__location__, SETTINGSFILE)
-        with open(file, 'r') as f:
+        with open(SETTINGSFILE, 'r') as f:
             settings = json.load(f)
             ui.tuning = settings['tuning']
             ui.strings = settings['strings']

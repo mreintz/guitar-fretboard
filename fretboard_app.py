@@ -617,7 +617,9 @@ def setup_help_dialog(help_dialog):
 
 def write_settings(settings):
     """Write settings to file."""
-    with open(SETTINGSFILE, 'w') as f:
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    file = os.path.join(__location__, SETTINGSFILE)
+    with open(file, 'w') as f:
         json.dump(settings, f)
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -651,7 +653,9 @@ if __name__ == "__main__":
 
     # First load settings from file if available
     try:
-        with open(SETTINGSFILE, 'r') as f:
+        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        file = os.path.join(__location__, SETTINGSFILE)
+        with open(file, 'r') as f:
             settings = json.load(f)
             ui.tuning = settings['tuning']
             ui.strings = settings['strings']

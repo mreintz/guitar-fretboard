@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import *
 
 class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
@@ -71,6 +71,14 @@ class QLabelClickable(QtWidgets.QLabel):
             self.selected.emit()
         else:
             self.clicked.emit()
+
+        modifiers = QtGui.QGuiApplication.keyboardModifiers()
+        if ( modifiers & QtCore.Qt.ShiftModifier):
+            print('Shift+Click')
+        elif ( modifiers & QtCore.Qt.ControlModifier):
+            print('Control+Click')
+        else:
+            print('Click')        
 
 class QPushButtonRightClick(QtWidgets.QPushButton):
     def __init__(self, parent, **kwargs):

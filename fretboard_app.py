@@ -13,11 +13,17 @@ from overloadedQtClasses import QLabelClickable
 from helpDialog import HelpDialog
 import fretboard_rc
 
-SETTINGSFILENAME = "fretboard_settings.json"
-__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-SETTINGSFILE = os.path.join(__location__, SETTINGSFILENAME)
+play_sounds = False
 
-HELP_MESSAGES = [
+try:
+    from play_sounds import *
+    play_sounds = True
+except ModuleNotFoundError:
+    print("Install the tinysoundfont package if you want sound support.")
+
+SETTINGSFILENAME = "fretboard_settings.json"
+
+help_messages = [
     ['<space>', 'Toggle between scale and chord'],
     ['I',       'Show notes or (I)ntervals'],
     ['N',       'Revert number of frets to (N)ormal'],
@@ -29,21 +35,6 @@ HELP_MESSAGES = [
     ['?',       'Display this message'],
     ['', ''],
 ]
-
-def eighteen_rule():
-    """Create fret widths according to the 'rule of eighteen'."""
-    global fretWidths
-
-    full_fretboard = 2000
-    first_fret = full_fretboard / 18
-    remaining = full_fretboard - first_fret
-    fretWidths = [round(first_fret)]
-    for i in range(25):
-        next_fret = remaining/18
-        remaining = remaining - next_fret
-        fretWidths.append(round(next_fret))
-
-eighteen_rule()
 
 LABEL_COLORS = [
     "background-color: rgba(205, 253, 205, 80%);",
@@ -71,6 +62,19 @@ REPLACEMENT_STRINGS = {
     'maj ':  'major ',
     'aug ':  'augmented '
 }
+
+def eighteen_rule():
+    """Create fret widths according to the 'rule of eighteen'."""
+    full_fretboard = 2000
+    first_fret = full_fretboard / 18
+    remaining = full_fretboard - first_fret
+    fretWidths = [round(first_fret)]
+    for i in range(25):
+        next_fret = remaining/18
+        remaining = remaining - next_fret
+        fretWidths.append(round(next_fret))
+
+    return fretWidths
 
 def translate(string):
     """Translate to ascii characters for flats and sharps."""
@@ -582,13 +586,13 @@ def edit_settings():
 
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
-        subprocess.call([editor, SETTINGSFILE])
+        subprocess.call([editor, settingsfile])
     except:
         try:
             import webbrowser
-            webbrowser.open(SETTINGSFILE)
+            webbrowser.open(settingsfile)
         except:
-            print(f"No default editor found. You need to edit {SETTINGSFILE} manually.")
+            print(f"No default editor found. You need to edit {settingsfile} manually.")
     finally:
         sys.exit()
 
@@ -599,7 +603,7 @@ def setup_help_dialog(help_dialog):
     helpDialogUi.OKButton.clicked.connect(help_dialog.hide)
     helpDialogUi.editButton.clicked.connect(edit_settings)
 
-    for i, row in enumerate(HELP_MESSAGES):
+    for i, row in enumerate(help_messages):
         text1 = row[0]
         text2 = row[1]
         label1, label2 = [ QtWidgets.QLabel(help_dialog) for i in range(2) ]
@@ -617,7 +621,7 @@ def setup_help_dialog(help_dialog):
 
 def write_settings(settings):
     """Write settings to file."""
-    with open(SETTINGSFILE, 'w') as f:
+    with open(settingsfile, 'w') as f:
         json.dump(settings, f)
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -642,6 +646,11 @@ class MyMainWindow(QtWidgets.QMainWindow):
             print('Not writing settings to file.')
 
 if __name__ == "__main__":
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    settingsfile = os.path.join(__location__, SETTINGSFILENAME)
+
+    fretWidths = eighteen_rule()
+
     app = QtWidgets.QApplication(sys.argv)
     main_window = MyMainWindow()
 
@@ -651,7 +660,7 @@ if __name__ == "__main__":
 
     # First load settings from file if available
     try:
-        with open(SETTINGSFILE, 'r') as f:
+        with open(settingsfile, 'r') as f:
             settings = json.load(f)
             ui.tuning = settings['tuning']
             ui.strings = settings['strings']

@@ -617,7 +617,7 @@ def edit_settings():
         else:
             DEFAULT_EDITOR = 'editor' # backup, if not defined in environment vars
 
-        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        __location__ = os.getcwd() #os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         editor = os.environ.get('EDITOR', DEFAULT_EDITOR)
         subprocess.call([editor, settingsfile])
     except:
@@ -679,7 +679,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             print('Not writing settings to file.')
 
 if __name__ == "__main__":
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    __location__ = os.getcwd() #os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     settingsfile = os.path.join(__location__, SETTINGSFILENAME)
 
     fretWidths = eighteen_rule()

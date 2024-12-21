@@ -503,7 +503,6 @@ def play(type, *args):
     """If sound support, play chords and notes."""
     if play_sounds:
         if type=='note':
-            print(args[0])
             try:
                 note = Note(args[0])
                 play_arpeggio([note])
@@ -519,8 +518,6 @@ def play(type, *args):
                 note = Note(str(ui.scale.notes[0]))
                 scale_notes = [(note + i) for i in ui.scale.intervals]
                 play_arpeggio(scale_notes)
-
-    select('root')
 
 def initial_setup(ui):
     """Initial setup of the UI."""
@@ -548,6 +545,7 @@ def initial_setup(ui):
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
+    ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
@@ -556,6 +554,7 @@ def initial_setup(ui):
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
     ui.scaleOrChordTypeSelector.help.connect(lambda window=True: help_message(window))
+    ui.scaleOrChordTypeSelector.play.connect(lambda thing='scale': play(thing))
 
     ui.titleLabel.clicked.connect(lambda thing='scale': play(thing))
     ui.titleLabel.selected.connect(lambda thing='arpeggio': play(thing))

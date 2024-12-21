@@ -6,7 +6,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
     def __init__(self, parent):
         super().__init__(parent)
 
-    notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help = [ pyqtSignal() for i in range(8) ]
+    notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(9) ]
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
@@ -27,6 +27,8 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
             self.majmin.emit()
         elif event.key() == QtCore.Qt.Key_Question:
             self.help.emit()
+        elif event.key() == QtCore.Qt.Key_P:
+            self.play.emit()
         else:
             super(QComboBoxWithKeyEvents, self).keyPressEvent(event)
 

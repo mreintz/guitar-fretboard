@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick
+from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick, QLabelClickable
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, tooltip, strings=...):
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
-        self.titleLabel = QtWidgets.QLabel(self.centralwidget)
+        self.titleLabel = QLabelClickable(self.centralwidget)
         self.titleLabel.setMaximumSize(QtCore.QSize(16777215, 100))
         font = QtGui.QFont()
         font.setPointSize(20)

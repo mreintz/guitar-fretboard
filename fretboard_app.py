@@ -491,6 +491,19 @@ def help_message(show_window):
         help_dialog.show()
     select('root')
 
+def play(arpeggio):
+    if ui.showChord:
+        print(ui.chord.notes)
+        if arpeggio:
+            play_arpeggio(ui.chord.notes)
+        else:
+            play_chord(ui.chord.notes)
+    else:
+        print(ui.scale.notes)
+        note = Note(str(ui.scale.notes[0]))
+        scale_notes = [(note + i) for i in ui.scale.intervals]
+        play_arpeggio(scale_notes)
+
 def initial_setup(ui):
     """Initial setup of the UI."""
     ui.showChord = False
@@ -525,6 +538,9 @@ def initial_setup(ui):
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
     ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
     ui.scaleOrChordTypeSelector.help.connect(lambda window=True: help_message(window))
+
+    ui.titleLabel.clicked.connect(lambda arpeggio=False: play(arpeggio))
+    ui.titleLabel.selected.connect(lambda arpeggio=True: play(arpeggio))
 
     ui.nutButton.setFocusPolicy(QtCore.Qt.ClickFocus)
 

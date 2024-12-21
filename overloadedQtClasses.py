@@ -73,12 +73,15 @@ class QLabelClickable(QtWidgets.QLabel):
             self.clicked.emit()
 
         modifiers = QtGui.QGuiApplication.keyboardModifiers()
-        if ( modifiers & QtCore.Qt.ShiftModifier):
-            print('Shift+Click')
+        if modifiers & QtCore.Qt.ShiftModifier:
+            if modifiers & QtCore.Qt.ControlModifier:
+                ...
+            else:
+                ...
         elif ( modifiers & QtCore.Qt.ControlModifier):
-            print('Control+Click')
+            ...
         else:
-            print('Click')        
+            ...
 
 class QPushButtonRightClick(QtWidgets.QPushButton):
     def __init__(self, parent, **kwargs):

@@ -64,24 +64,16 @@ class QLabelClickable(QtWidgets.QLabel):
         super().__init__(parent, **kwargs)
         self.transparency = False
 
-    clicked, selected = [ pyqtSignal() for i in range(2) ]
+    clicked, selected, ctrl_clicked = [ pyqtSignal() for i in range(3) ]
 
     def mousePressEvent(self, ev):
-        if ev.button() == Qt.RightButton:
+        modifiers = QtGui.QGuiApplication.keyboardModifiers()
+        if modifiers & QtCore.Qt.ControlModifier:
+            self.ctrl_clicked.emit()
+        elif ev.button() == Qt.RightButton:
             self.selected.emit()
         else:
             self.clicked.emit()
-
-        modifiers = QtGui.QGuiApplication.keyboardModifiers()
-        if modifiers & QtCore.Qt.ShiftModifier:
-            if modifiers & QtCore.Qt.ControlModifier:
-                ...
-            else:
-                ...
-        elif ( modifiers & QtCore.Qt.ControlModifier):
-            ...
-        else:
-            ...
 
 class QPushButtonRightClick(QtWidgets.QPushButton):
     def __init__(self, parent, **kwargs):

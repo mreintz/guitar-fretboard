@@ -6,7 +6,6 @@ import platform
 import sys
 import re
 from musthe import Note, Chord, Scale
-import pandas as pd
 from PyQt5 import QtWidgets, QtCore, QtGui
 from fretboard_ui import Ui_MainWindow
 from fretboard import Fretboard
@@ -93,9 +92,10 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
 
     # We don't want to show the tuning after the nut as a fret, so we cut that column out.
     if min(frets) == 0:
-        fret_slice = range(1, frets[1]+1)
-        df = pd.DataFrame(fretboard)
-        fretboard = df[ fret_slice ].values.tolist()
+        board = []
+        for row in fretboard:
+            board.append(row[1: frets[1]+1])
+        fretboard = board
 
     # "Flatten" the notes and intervals into a single list for easy lookup.
     flattened_notes = []
@@ -732,7 +732,7 @@ if __name__ == "__main__":
             ui.resetFrets = settings['resetFrets']
     except:
         loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
-        ui.tuning = ui.tuning[1:]
+        loaded_tuning_with_octave = loaded_tuning_with_octave[1:]
         ui.strings = 6
         ui.frets = (0,24)
         ui.title = "Guitar fretboard, scales and chords"

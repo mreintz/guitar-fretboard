@@ -4,6 +4,7 @@ import os
 import subprocess
 import platform
 import sys
+import re
 from musthe import Note, Chord, Scale
 import pandas as pd
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -403,6 +404,13 @@ def update():
 def tune_with_octave(tuning):
     ui.tuning_with_octave = tuning
     ui.tuning = [ str(Note(n)) for n in tuning ]
+    ui.octaves = []
+    for note in tuning:
+        try:
+            octave = re.findall(r'\d+', note)[0]
+        except IndexError:
+            octave = ''
+        ui.octaves.append(octave)
 
 def tuning(string):
     """Deal with changes in tuning from one of the tuning peg input boxes."""
@@ -410,14 +418,20 @@ def tuning(string):
     string_tuned_with_octave = ui.tuningButtons[string].text().capitalize()
     new = string_tuned_with_octave
     new_text = ''
+    new_octave = re.findall(r'\d+', new)
+    if new_octave == []:
+        new_octave = ui.octaves[string]
+        new = new + new_octave
+    else:
+        new_octave = new_octave[0]
+        ui.octaves[string] = new_octave
+
     try:
         new_text = str(Note(new))
     except ValueError:
         new = old
         new_text = str(Note(new))
     ui.tuningButtons[string].setText(new_text)
-
-    print(old, new, string_tuned_with_octave)
 
     match = False
     for row in ui.enharmonics:
@@ -429,7 +443,7 @@ def tuning(string):
         ui.statusbar.showMessage(f"Not a valid tuning, reverting to {old}", 10000)
         ui.tuningButtons[string].setText(translate(old))
     elif old != new:
-        ui.tuning_with_octave[string] = string_tuned_with_octave
+        ui.tuning_with_octave[string] = new
         ui.tuning[string] = new_text
         ui.statusbar.showMessage(f"Tuning is now {''.join(ui.tuning)}", 10000)
         update()

@@ -82,7 +82,7 @@ def translate(string):
     string=string.replace('#', '♯')
     return string
 
-def populate_fretboard(ui, notes, intervals, frets):
+def populate_fretboard(ui, notes, intervals, midi, frets):
     """Set up all the labels with notes or intervals on them"""
     ui.labels = []
     if ui.showInterval:
@@ -99,10 +99,13 @@ def populate_fretboard(ui, notes, intervals, frets):
     # "Flatten" the notes and intervals into a single list for easy lookup.
     flattened_notes = []
     flattened_intervals = []
+    flattened_midi = []
     for row in notes:
         flattened_notes += row
     for row in intervals:
         flattened_intervals += row
+    for row in midi:
+        flattened_midi += row
 
     # Setting up the labels...
     for i, row in enumerate(fretboard):
@@ -111,9 +114,9 @@ def populate_fretboard(ui, notes, intervals, frets):
             label = QLabelClickable(ui.centralwidget, text=translate(column))
             if play_sounds:
                 if ui.showInterval:
-                    note = flattened_notes[flattened_intervals.index(column)]
+                    note = flattened_midi[flattened_intervals.index(column)]
                 else:
-                    note = column
+                    note = flattened_midi[flattened_notes.index(column)]
                 label.clicked.connect(lambda thing='note', note=note: play(thing, note))
                 label.ctrl_clicked.connect(lambda x=label: toggle_transparency(x))
             else:
@@ -366,12 +369,12 @@ def update():
     # Generate the new notes and intervals.
     f = Fretboard(tuning=ui.tuning)
     if ui.showChord:
-        notes, intervals = f.build(chord=ui.chord, frets=ui.frets)
+        notes, intervals, midi = f.build(chord=ui.chord, frets=ui.frets)
     else:
-        notes, intervals = f.build(scale=ui.scale, frets=ui.frets)
+        notes, intervals, midi = f.build(scale=ui.scale, frets=ui.frets)
 
     # Generate and populate the new fretboard.
-    populate_fretboard(ui, notes, intervals, ui.frets)
+    populate_fretboard(ui, notes, intervals, midi, ui.frets)
 
     # Show the notes in the chord or scale in the title label.
     if ui.showChord:
@@ -504,8 +507,8 @@ def play(type, *args):
     if play_sounds:
         if type=='note':
             try:
-                note = Note(args[0])
-                play_arpeggio([note])
+                note = args[0]
+                play_note(note)
             except ValueError:
                 pass
         else:
@@ -572,7 +575,7 @@ def initial_setup(ui):
     ui.frets_old = ui.frets
 
     f = Fretboard(tuning=ui.tuning)
-    notes, intervals = f.build(scale=ui.scale, frets=ui.frets)
+    notes, intervals, midi = f.build(scale=ui.scale, frets=ui.frets)
 
     ui.enharmonics = f.enharmonics
 
@@ -595,7 +598,7 @@ def initial_setup(ui):
                  'B',]
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
-    populate_fretboard(ui, notes, intervals, ui.frets)
+    populate_fretboard(ui, notes, intervals, midi, ui.frets)
 
     main_window.resize(main_window.minimumSizeHint())
     main_window.adjustSize()

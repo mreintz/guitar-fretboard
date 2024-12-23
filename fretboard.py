@@ -7,7 +7,7 @@ class Fretboard():
         """Fretboard(tuning=tuning) (a list of notes), defaults to ['E', 'A', 'B', 'G', 'D', 'E'])"""
 
         if tuning==...:
-            tuning = ['E', 'A', 'B', 'G', 'D', 'E']
+            tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
         
         self.enharmonics = [
             ['C',  'C',  'B#',  'Dbb'],
@@ -25,7 +25,9 @@ class Fretboard():
         ]
 
         # Reverse tuning for "top-down view"
-        self.tuning = tuning[::-1]
+        self.tuning_with_octaves = tuning
+        self.tuning_with_octaves = self.tuning_with_octaves[::-1]
+        self.tuning = [ str(Note(n)) for n in self.tuning_with_octaves ]
 
         # Contains all the possible notes on the fretboard with a certain tuning
         self.all_the_notes = {}
@@ -80,7 +82,20 @@ class Fretboard():
         """Place all the submitted notes on the fretboard."""
         notes_grid = []
         intervals_grid = []
+        midi_grid = []
 
+        for tuning_peg in self.tuning_with_octaves:
+            note0 = Note(tuning_peg).midi_note()
+            midi_row = [ tone for tone in range(note0, note0+self.frets[1]+1) ]
+            midi_grid.append(midi_row)
+        
+        if self.frets == (0, 24):
+            self.midi_grid = midi_grid
+        else:
+            df_m = pd.DataFrame(midi_grid)
+            fret_slice = range(self.frets[0], self.frets[1]+1)
+            self.midi_grid = df_m[ fret_slice ].values.tolist()
+            
         # Go through all the possible enharmonic notes on each string
         for string in self.all_the_notes.keys():
             notes_row = []
@@ -99,16 +114,18 @@ class Fretboard():
                     intervals_row.append("")
             notes_grid.append(notes_row)
             intervals_grid.append(intervals_row)
-            if self.frets == (0, 24):
-                self.notes_grid = notes_grid
-                self.intervals_grid = intervals_grid
-            else:
-                df_n = pd.DataFrame(notes_grid)
-                df_i = pd.DataFrame(intervals_grid)
-                fret_slice = range(self.frets[0], self.frets[1]+1)
-                self.notes_grid = df_n[ fret_slice ].values.tolist()
-                self.intervals_grid = df_i[ fret_slice ].values.tolist()
-        return self.notes_grid, self.intervals_grid
+        
+        if self.frets == (0, 24):
+            self.notes_grid = notes_grid
+            self.intervals_grid = intervals_grid
+        else:
+            df_n = pd.DataFrame(notes_grid)
+            df_i = pd.DataFrame(intervals_grid)
+            fret_slice = range(self.frets[0], self.frets[1]+1)
+            self.notes_grid = df_n[ fret_slice ].values.tolist()
+            self.intervals_grid = df_i[ fret_slice ].values.tolist()
+        
+        return self.notes_grid, self.intervals_grid, self.midi_grid
 
     def printPlain(self):
         """After running build(), this function can print a plain version of the fretboard to console."""

@@ -33,6 +33,11 @@ def play_chord(notes):
     for n in midi_notes:
         synth.noteoff(0, n)
 
+def play_note(note):
+    synth.noteon(0, note, 100)
+    time.sleep(0.5)
+    synth.noteoff(0, note)
+
 if __name__ == '__main__':
     chord = Chord(Note('C#'), 'min')
     note = Note('C')

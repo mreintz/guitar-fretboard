@@ -99,28 +99,26 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
     # "Flatten" the notes and intervals into a single list for easy lookup.
     flattened_notes = []
     flattened_intervals = []
-    flattened_midi = []
     for row in notes:
         flattened_notes += row
     for row in intervals:
         flattened_intervals += row
-    for row in midi:
-        flattened_midi += row
 
     # Setting up the labels...
     for i, row in enumerate(fretboard):
         label_row = []
         for j, column in enumerate(row, start=1):
             label = QLabelClickable(ui.centralwidget, text=translate(column))
-            if play_sounds:
-                if ui.showInterval:
-                    note = flattened_midi[flattened_intervals.index(column)]
+            if column != '':
+                if play_sounds:
+                    if ui.frets[0] == 0:
+                        note = midi[i][j]
+                    else:
+                        note = midi[i][j-1]
+                    label.clicked.connect(lambda thing='note', note=note: play(thing, note))
+                    label.ctrl_clicked.connect(lambda x=label: toggle_transparency(x))
                 else:
-                    note = flattened_midi[flattened_notes.index(column)]
-                label.clicked.connect(lambda thing='note', note=note: play(thing, note))
-                label.ctrl_clicked.connect(lambda x=label: toggle_transparency(x))
-            else:
-                label.clicked.connect(lambda x=label: toggle_transparency(x))
+                    label.clicked.connect(lambda x=label: toggle_transparency(x))
             label.selected.connect(lambda x=label: select_root_from_label(x))
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))

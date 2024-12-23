@@ -4,11 +4,14 @@ import pandas as pd
 class Fretboard():
     """Generate Fretboard object with tuning."""
     def __init__(self, tuning=...):
-        """Fretboard(tuning=tuning) (a list of notes), defaults to ['E', 'A', 'B', 'G', 'D', 'E'])"""
+        """Fretboard(tuning=tuning) (a list of notes), defaults to ['E', 'A', 'D', 'G', 'B', 'E'])"""
 
         if tuning==...:
             tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
-        
+
+        if tuning==['E', 'A', 'D', 'G', 'B', 'E']:
+            tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
+
         self.enharmonics = [
             ['C',  'C',  'B#',  'Dbb'],
             ['C#', 'Db'              ],
@@ -124,7 +127,7 @@ class Fretboard():
             fret_slice = range(self.frets[0], self.frets[1]+1)
             self.notes_grid = df_n[ fret_slice ].values.tolist()
             self.intervals_grid = df_i[ fret_slice ].values.tolist()
-        
+
         return self.notes_grid, self.intervals_grid, self.midi_grid
 
     def printPlain(self):

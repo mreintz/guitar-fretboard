@@ -365,7 +365,7 @@ def update():
         clear_from_grid(dot)
 
     # Generate the new notes and intervals.
-    f = Fretboard(tuning=ui.tuning)
+    f = Fretboard(tuning=ui.tuning_with_octave)
     if ui.showChord:
         notes, intervals, midi = f.build(chord=ui.chord, frets=ui.frets)
     else:
@@ -400,23 +400,37 @@ def update():
         ui.frets_old = ui.frets
         ui.resize = False
 
+def tune_with_octave(tuning):
+    ui.tuning_with_octave = tuning
+    ui.tuning = [ str(Note(n)) for n in tuning ]
+
 def tuning(string):
     """Deal with changes in tuning from one of the tuning peg input boxes."""
-    old = ui.tuning[string]
-    ui.tuningButtons[string].setText(ui.tuningButtons[string].text().capitalize())
-    new = ui.tuningButtons[string].text()
+    old = ui.tuning_with_octave[string]
+    string_tuned_with_octave = ui.tuningButtons[string].text().capitalize()
+    new = string_tuned_with_octave
+    new_text = ''
+    try:
+        new_text = str(Note(new))
+    except ValueError:
+        new = old
+        new_text = str(Note(new))
+    ui.tuningButtons[string].setText(new_text)
+
+    print(old, new, string_tuned_with_octave)
 
     match = False
     for row in ui.enharmonics:
         for note in row:
-            if new == note:
+            if new_text == note:
                 match = True
 
     if not match:
         ui.statusbar.showMessage(f"Not a valid tuning, reverting to {old}", 10000)
         ui.tuningButtons[string].setText(translate(old))
     elif old != new:
-        ui.tuning[string] = new
+        ui.tuning_with_octave[string] = string_tuned_with_octave
+        ui.tuning[string] = new_text
         ui.statusbar.showMessage(f"Tuning is now {''.join(ui.tuning)}", 10000)
         update()
 
@@ -666,7 +680,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         settings = {
-            'tuning':   ui.tuning,
+            'tuning':   ui.tuning_with_octave,
             'strings':  ui.strings,
             'frets':    ui.frets,
             'resetFrets': ui.resetFrets,
@@ -696,7 +710,7 @@ if __name__ == "__main__":
     try:
         with open(settingsfile, 'r') as f:
             settings = json.load(f)
-            ui.tuning = settings['tuning']
+            loaded_tuning_with_octave = settings['tuning']
             ui.strings = settings['strings']
             ui.frets = settings['frets']
             ui.title = settings['title']
@@ -713,6 +727,10 @@ if __name__ == "__main__":
             'double':   [12]
         }
         ui.resetFrets = ui.frets
+
+    tune_with_octave(loaded_tuning_with_octave)
+    print(ui.tuning)
+    print(ui.tuning_with_octave)
 
     # Set up and parse CLI arguments
     all_scales = [ s for s in Scale.scales.keys() ]

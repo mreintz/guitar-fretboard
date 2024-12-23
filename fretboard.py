@@ -1,5 +1,4 @@
 from musthe import *
-import pandas as pd
 
 class Fretboard():
     """Generate Fretboard object with tuning."""
@@ -91,14 +90,14 @@ class Fretboard():
             note0 = Note(tuning_peg).midi_note()
             midi_row = [ tone for tone in range(note0, note0+self.frets[1]+1) ]
             midi_grid.append(midi_row)
-        
+
         if self.frets == (0, 24):
             self.midi_grid = midi_grid
         else:
-            df_m = pd.DataFrame(midi_grid)
-            fret_slice = range(self.frets[0], self.frets[1]+1)
-            self.midi_grid = df_m[ fret_slice ].values.tolist()
-            
+            self.midi_grid = []
+            for row in midi_grid:
+                self.midi_grid.append( row[self.frets[0]:self.frets[1]+1] )
+
         # Go through all the possible enharmonic notes on each string
         for string in self.all_the_notes.keys():
             notes_row = []
@@ -117,16 +116,17 @@ class Fretboard():
                     intervals_row.append("")
             notes_grid.append(notes_row)
             intervals_grid.append(intervals_row)
-        
+
         if self.frets == (0, 24):
             self.notes_grid = notes_grid
             self.intervals_grid = intervals_grid
         else:
-            df_n = pd.DataFrame(notes_grid)
-            df_i = pd.DataFrame(intervals_grid)
-            fret_slice = range(self.frets[0], self.frets[1]+1)
-            self.notes_grid = df_n[ fret_slice ].values.tolist()
-            self.intervals_grid = df_i[ fret_slice ].values.tolist()
+            self.notes_grid = []
+            self.intervals_grid = []
+            for row in notes_grid:
+                self.notes_grid.append( row[self.frets[0]:self.frets[1]+1] )
+            for row in intervals_grid:
+                self.intervals_grid.append( row[self.frets[0]:self.frets[1]+1] )
 
         return self.notes_grid, self.intervals_grid, self.midi_grid
 

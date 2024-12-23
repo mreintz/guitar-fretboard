@@ -254,7 +254,7 @@ def select_root_from_label(thing):
         selected = thing.objectName()
     else:
         selected = thing.rootNote
-        
+
     # Set the root note to the note right-clicked.
     if selected in ui.rootNotes:
         ui.rootNoteSelector.setCurrentText(selected)
@@ -595,7 +595,7 @@ def initial_setup(ui):
     for i, t in enumerate(ui.tuningButtons):
         t.returnPressed.connect(lambda string=i: tuning(string))
         t.escape.connect(lambda thing='root': select(thing))
-        t.selected.connect(lambda x=t: select_root_from_label(x)) 
+        t.selected.connect(lambda x=t: select_root_from_label(x))
         t.edit.connect(lambda string=i: edit_tuning_peg(string))
 
     ui.frets_old = ui.frets
@@ -731,7 +731,7 @@ if __name__ == "__main__":
             ui.markers = settings['markers']
             ui.resetFrets = settings['resetFrets']
     except:
-        ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+        loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
         ui.tuning = ui.tuning[1:]
         ui.strings = 6
         ui.frets = (0,24)
@@ -741,10 +741,6 @@ if __name__ == "__main__":
             'double':   [12]
         }
         ui.resetFrets = ui.frets
-
-    tune_with_octave(loaded_tuning_with_octave)
-    print(ui.tuning)
-    print(ui.tuning_with_octave)
 
     # Set up and parse CLI arguments
     all_scales = [ s for s in Scale.scales.keys() ]
@@ -771,7 +767,7 @@ if __name__ == "__main__":
 
     if args.preset:
         if args.preset == 'ukulele':
-            ui.tuning = ['G', 'C', 'E', 'A']
+            loaded_tuning_with_octave = ['G4', 'C4', 'E4', 'A4']
             ui.strings = 4
             ui.frets = (0,17)
             ui.resetFrets = ui.frets
@@ -781,8 +777,8 @@ if __name__ == "__main__":
                 'double':   [12]
             }
         elif args.preset == 'guitar':
-            ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
-            ui.tuning = ui.tuning[1:]
+            loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
+            loaded_tuning_with_octave = loaded_tuning_with_octave[1:]
             ui.strings = 6
             ui.frets = (0,24)
             ui.resetFrets = ui.frets
@@ -792,7 +788,7 @@ if __name__ == "__main__":
                 'double':   [12]
             }
         elif args.preset == '7-string':
-            ui.tuning = ['B', 'E', 'A', 'D', 'G', 'B', 'E']
+            loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
             ui.strings = 7
             ui.frets = (0,24)
             ui.resetFrets = ui.frets
@@ -802,7 +798,7 @@ if __name__ == "__main__":
                 'double':   [12]
             }
         elif args.preset == 'banjo':
-            ui.tuning = ['G', 'D', 'G', 'B', 'D']
+            loaded_tuning_with_octave = ['G4', 'D3', 'G3', 'B3', 'D4']
             ui.strings = 5
             ui.frets = (0,24)
             ui.resetFrets = ui.frets
@@ -811,6 +807,8 @@ if __name__ == "__main__":
                 'single':   [3, 5, 7, 10, 15, 17, 19, 22],
                 'double':   [12]
             }
+
+    tune_with_octave(loaded_tuning_with_octave)
 
     ui.tooltip = not args.notooltip
 

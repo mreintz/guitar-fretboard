@@ -117,6 +117,7 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
             if column != '':
                 if play_sounds:
                     if ui.frets[0] == 0:
+                        # Leave out the first fret, as it's the nut.
                         note = midi[i][j]
                     else:
                         note = midi[i][j-1]
@@ -124,6 +125,11 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
                     label.ctrl_clicked.connect(lambda x=label: toggle_transparency(x))
                 else:
                     label.clicked.connect(lambda x=label: toggle_transparency(x))
+            else:
+                if play_sounds:
+                    # Play chord or scale if empty label is clicked.
+                    label.clicked.connect(lambda thing='scale': play(thing))
+                    label.selected.connect(lambda thing='arpeggio': play(thing))
             label.selected.connect(lambda x=label: select_root_from_label(x))
             label.setMinimumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
             label.setMaximumSize(QtCore.QSize(fretWidths[j+1], 40)) #(40, 40))
@@ -143,7 +149,10 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
                 label.setFrameShape(QtWidgets.QFrame.Box)
                 label.setLineWidth(3)
                 if ui.tooltip:
-                    label.setToolTip('Left click to toggle transparency, right click to set root note.')
+                    if play_sounds:
+                        label.setToolTip('Left click to play note, Ctrl+left click to toggle transparency, right click to set root note.')
+                    else:
+                        label.setToolTip('Left click to toggle transparency, right click to set root note.')
                 if ui.showInterval:
                     interval =  label.objectName()
                     if interval != "P1":

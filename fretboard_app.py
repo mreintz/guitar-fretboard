@@ -402,6 +402,7 @@ def update():
         ui.resize = False
 
 def tune_with_octave(tuning):
+    """Set the tuning with octave."""
     ui.tuning_with_octave = tuning
     ui.tuning = [ str(Note(n)) for n in tuning ]
     ui.octaves = []
@@ -519,7 +520,6 @@ def select(thing):
         ui.tuningButtons[0].setFocus()
         ui.tuningButtons[0].selectAll()
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning, Esc to return.", 10000)
-    return
 
 def help_message(show_window):
     """Displays help message in statusbar, optionally in separate window."""
@@ -528,12 +528,12 @@ def help_message(show_window):
         help_dialog.show()
     select('root')
 
-def play(type, *args):
+def play(type, *play_args):
     """If sound support, play chords and notes."""
     if play_sounds:
         if type=='note':
             try:
-                note = args[0]
+                note = play_args[0]
                 play_note(note)
             except ValueError:
                 pass
@@ -719,6 +719,9 @@ if __name__ == "__main__":
     help_dialog = QtWidgets.QDialog()
     setup_help_dialog(help_dialog)
     ui = Ui_MainWindow()
+    ui.enharmonics = []
+    ui.allScales = []
+    ui.allChords = []
 
     # First load settings from file if available
     try:
@@ -730,7 +733,32 @@ if __name__ == "__main__":
             ui.title = settings['title']
             ui.markers = settings['markers']
             ui.resetFrets = settings['resetFrets']
-    except:
+    except FileNotFoundError:
+        print(f"Settings file {settingsfile} not found. Using default settings.")
+        loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
+        loaded_tuning_with_octave = loaded_tuning_with_octave[1:]
+        ui.strings = 6
+        ui.frets = (0,24)
+        ui.title = "Guitar fretboard, scales and chords"
+        ui.markers = {
+            'single':   [3, 5, 7, 9, 15, 17, 19, 21],
+            'double':   [12]
+        }
+        ui.resetFrets = ui.frets
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from settings file {settingsfile}. Using default settings.")
+        loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
+        loaded_tuning_with_octave = loaded_tuning_with_octave[1:]
+        ui.strings = 6
+        ui.frets = (0,24)
+        ui.title = "Guitar fretboard, scales and chords"
+        ui.markers = {
+            'single':   [3, 5, 7, 9, 15, 17, 19, 21],
+            'double':   [12]
+        }
+        ui.resetFrets = ui.frets
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}. Using default settings.")
         loaded_tuning_with_octave = ['B1', 'E2', 'A2', 'D3', 'G3', 'B3', 'E4']
         loaded_tuning_with_octave = loaded_tuning_with_octave[1:]
         ui.strings = 6
@@ -826,20 +854,20 @@ if __name__ == "__main__":
             ui.resize = True
 
     root = args.rootnote
-    type = args.type
+    type_of_scale_or_chord = args.type
 
-    if type in ui.allScales:
-        ui.scale = Scale(Note(root), type)
+    if type_of_scale_or_chord in ui.allScales:
+        ui.scale = Scale(Note(root), type_of_scale_or_chord)
         ui.rootNoteSelector.setCurrentText(root)
-        ui.scaleOrChordTypeSelector.setCurrentText(type)
+        ui.scaleOrChordTypeSelector.setCurrentText(type_of_scale_or_chord)
     else:
-        ui.chord = Chord(Note(root), type)
+        ui.chord = Chord(Note(root), type_of_scale_or_chord)
         ui.showChord = True
         ui.scaleOrChordSlider.setValue(1)
         ui.scaleOrChordTypeSelector.clear()
         ui.scaleOrChordTypeSelector.addItems(ui.allChords)
         ui.rootNoteSelector.setCurrentText(root)
-        ui.scaleOrChordTypeSelector.setCurrentText(type)
+        ui.scaleOrChordTypeSelector.setCurrentText(type_of_scale_or_chord)
 
     update()
 

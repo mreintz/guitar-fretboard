@@ -1,6 +1,8 @@
 # guitar-fretboard
 
 <b>New functionality! Sound support</b> Click on scale or chord to play. 
+Full octave support. Illustrated Nashville tuning for guitar:
+![image](https://github.com/user-attachments/assets/f8b2bc5c-3a60-4e84-86e4-70de4146b452)
 
 Interactive guitar fretboard with scales and chords
 ![image](https://github.com/user-attachments/assets/9cc158bb-7d2c-4aed-9d21-fc18d23e7e15)

@@ -27,7 +27,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
             self.majmin.emit()
         elif event.key() == QtCore.Qt.Key_Question:
             self.help.emit()
-        elif event.key() == QtCore.Qt.Key_P:
+        elif event.key() == QtCore.Qt.Key_Return:
             self.play.emit()
         else:
             super(QComboBoxWithKeyEvents, self).keyPressEvent(event)

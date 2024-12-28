@@ -270,6 +270,7 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
         peg.setText(translate(text))
 
 def find_key_signature():
+    """Find the key signature from the circle of fifths."""
     signature = 0
     index = 0
 
@@ -286,15 +287,17 @@ def find_key_signature():
                 break
 
     signature = index - 5
-    print(index, signature)
     ui.circle_of_fifths.setValue(index+1)
-
-    if signature > 0:
-        ui.signature_label.setText(f"{signature} {SHARP}")
-    elif signature < 0:
-        ui.signature_label.setText(f"{abs(signature)} {FLAT}")
+    
+    if ui.showChord:
+        ui.signature_label.setText('—')
     else:
-        ui.signature_label.setText(f"{NATURAL}")
+        if signature > 0:
+            ui.signature_label.setText(f"{signature} {SHARP}")
+        elif signature < 0:
+            ui.signature_label.setText(f"{abs(signature)} {FLAT}")
+        else:
+            ui.signature_label.setText(f"{NATURAL}")
 
 def select_root_from_label(thing):
     """Selects root note from label click."""

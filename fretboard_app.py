@@ -27,6 +27,10 @@ CIRCLE_OF_FIFTHS = [
     'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#',
 ]
 
+NATURAL = '♮'
+SHARP = '♯'
+FLAT = '♭'
+
 help_messages = [
     ['<space>', 'Toggle between scale and chord'],
     ['I',       'Show notes or (I)ntervals'],
@@ -265,6 +269,33 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
         peg.rootNote = text
         peg.setText(translate(text))
 
+def find_key_signature():
+    signature = 0
+    index = 0
+
+    root_note = ui.rootNoteSelector.currentText()
+    if root_note in CIRCLE_OF_FIFTHS:
+        index = CIRCLE_OF_FIFTHS.index(root_note)
+    else:
+        for row in ui.enharmonics:
+            if root_note in row:
+                for note in row:
+                    if note in CIRCLE_OF_FIFTHS:
+                        index = CIRCLE_OF_FIFTHS.index(note)
+                        break
+                break
+
+    signature = index - 5
+    print(index, signature)
+    ui.circle_of_fifths.setValue(index+1)
+
+    if signature > 0:
+        ui.signature_label.setText(f"{signature} {SHARP}")
+    elif signature < 0:
+        ui.signature_label.setText(f"{abs(signature)} {FLAT}")
+    else:
+        ui.signature_label.setText(f"{NATURAL}")
+
 def select_root_from_label(thing):
     """Selects root note from label click."""
     back_to_root = True
@@ -423,6 +454,8 @@ def update():
         main_window.adjustSize()
         ui.frets_old = ui.frets
         ui.resize = False
+
+    find_key_signature()
 
 def tune_with_octave(tuning):
     """Set the tuning with octave."""

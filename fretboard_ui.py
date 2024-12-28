@@ -152,6 +152,10 @@ class Ui_MainWindow(object):
         self.circle_of_fifths.setObjectName("circle_of_fifths")
         self.horizontalLayout_3.addWidget(self.circle_of_fifths)
 
+        self.signature_label = QtWidgets.QLabel(self.centralwidget)
+        self.signature_label.setObjectName("signature_label")
+        self.horizontalLayout_3.addWidget(self.signature_label)
+        self.signature_label.setText('N')
 
         self.scaleOrChordTypeSelector = QComboBoxWithKeyEvents(self.centralwidget)
         font = QtGui.QFont()

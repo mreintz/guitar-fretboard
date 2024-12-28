@@ -267,10 +267,13 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
 
 def select_root_from_label(thing):
     """Selects root note from label click."""
+    back_to_root = True
+
     if isinstance(thing, QLabelClickable):
         selected = thing.objectName()
     elif isinstance(thing, int):
         selected = CIRCLE_OF_FIFTHS[thing-1]
+        back_to_root = False
     else:
         selected = thing.rootNote
 
@@ -286,7 +289,8 @@ def select_root_from_label(thing):
                         ui.rootNoteSelector.setCurrentText(note)
                         break
     change_scale_or_chord()
-    ui.rootNoteSelector.setFocus()
+    if back_to_root:
+        ui.rootNoteSelector.setFocus()
 
 def toggle_transparency(label):
     """Toggle the transparency of a label."""
@@ -494,7 +498,7 @@ def change_scale_or_chord():
         ui.statusbar.showMessage(f"{root} {type}", 10000)
     update()
 
-def toggle(thing):
+def toggle(thing, back):
     """Method to toggle several switches."""
     if thing == 'intervals':
         if ui.notesOrIntervalsSlider.value() == 1:
@@ -522,7 +526,7 @@ def toggle(thing):
                 ui.scaleOrChordTypeSelector.setCurrentText('major')
                 change_scale_or_chord()
 
-    ui.rootNoteSelector.setFocus()
+    select(back)
 
 def edit_tuning_peg(string):
     """Start editing from the topmost string."""
@@ -535,6 +539,8 @@ def select(thing):
         ui.scaleOrChordTypeSelector.setFocus()
     elif thing == 'root':
         ui.rootNoteSelector.setFocus()
+    elif thing == 'circle':
+        ui.circle_of_fifths.setFocus()
     elif thing == 'tuning':
         ui.tuningButtons[0].setFocus()
         ui.tuningButtons[0].selectAll()
@@ -567,10 +573,6 @@ def play(type, *play_args):
                 scale_notes = [(note + i) for i in ui.scale.intervals]
                 play_arpeggio(scale_notes)
 
-def echo(val):
-    """Echo the value of the circle of fifths slider."""
-    ui.statusbar.showMessage(f"Circle of fifths: {CIRCLE_OF_FIFTHS[val-1]}", 10000)
-
 def initial_setup(ui):
     """Initial setup of the UI."""
     ui.showChord = False
@@ -590,23 +592,32 @@ def initial_setup(ui):
     ui.rootNoteSelector.activated.connect(change_scale_or_chord)
     ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
 
-    ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
-    ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
+    ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals', back='root': toggle(thing, back) )
+    ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord', back='root': toggle(thing, back) )
     ui.rootNoteSelector.nut.connect(reset_frets)
-    ui.rootNoteSelector.mode.connect(lambda thing='mode': select(thing))
+    ui.rootNoteSelector.mode.connect(lambda thing='circle': select(thing))
     ui.rootNoteSelector.tuning.connect(lambda thing='tuning': select(thing))
-    ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
+    ui.rootNoteSelector.majmin.connect(lambda thing='majmin', back='root': toggle(thing, back))
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
 
     ui.circle_of_fifths.valueChanged['int'].connect(lambda val = ui.circle_of_fifths.value(): select_root_from_label(val))
+    ui.circle_of_fifths.notesOrIntervals.connect(lambda thing='intervals', back='circle': toggle(thing, back) )
+    ui.circle_of_fifths.chordOrScale.connect(lambda thing='chord', back='circle': toggle(thing, back) )
+    ui.circle_of_fifths.nut.connect(reset_frets)
+    ui.circle_of_fifths.mode.connect(lambda thing='mode': select(thing))
+    ui.circle_of_fifths.root.connect(lambda thing='root': select(thing))
+    ui.circle_of_fifths.tuning.connect(lambda thing='tuning': select(thing))
+    ui.circle_of_fifths.majmin.connect(lambda thing='majmin', back='circle': toggle(thing, back))
+    ui.circle_of_fifths.help.connect(lambda window=True: help_message(window))
+    ui.circle_of_fifths.play.connect(lambda thing='scale': play(thing))    
 
-    ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
-    ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )
+    ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals', back='mode': toggle(thing, back) )
+    ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord', back='mode': toggle(thing, back) )
     ui.scaleOrChordTypeSelector.nut.connect(reset_frets)
-    ui.scaleOrChordTypeSelector.root.connect(lambda thing='root': select(thing))
+    ui.scaleOrChordTypeSelector.root.connect(lambda thing='circle': select(thing))
     ui.scaleOrChordTypeSelector.tuning.connect(lambda thing='tuning': select(thing))
-    ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin': toggle(thing))
+    ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin', back='mode': toggle(thing, back))
     ui.scaleOrChordTypeSelector.help.connect(lambda window=True: help_message(window))
     ui.scaleOrChordTypeSelector.play.connect(lambda thing='scale': play(thing))
 

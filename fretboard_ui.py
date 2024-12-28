@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick, QLabelClickable
+from overloadedQtClasses import QComboBoxWithKeyEvents, QLineEditTabReact, QPushButtonRightClick, QLabelClickable, QDialWithKeyEvents
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, tooltip, strings=...):
@@ -135,7 +135,7 @@ class Ui_MainWindow(object):
             self.rootNoteSelector.setToolTip('Select root note of the scale or chord.')
         self.horizontalLayout_3.addWidget(self.rootNoteSelector)
 
-        self.circle_of_fifths = QtWidgets.QDial(self.centralwidget)
+        self.circle_of_fifths = QDialWithKeyEvents(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -148,6 +148,7 @@ class Ui_MainWindow(object):
         self.circle_of_fifths.setProperty("value", 6)
         self.circle_of_fifths.setOrientation(QtCore.Qt.Vertical)
         self.circle_of_fifths.setWrapping(True)
+        self.circle_of_fifths.setNotchesVisible(True)
         self.circle_of_fifths.setObjectName("circle_of_fifths")
         self.horizontalLayout_3.addWidget(self.circle_of_fifths)
 

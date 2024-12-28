@@ -134,6 +134,24 @@ class Ui_MainWindow(object):
         if tooltip:
             self.rootNoteSelector.setToolTip('Select root note of the scale or chord.')
         self.horizontalLayout_3.addWidget(self.rootNoteSelector)
+
+        self.circle_of_fifths = QtWidgets.QDial(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.circle_of_fifths.sizePolicy().hasHeightForWidth())
+        self.circle_of_fifths.setSizePolicy(sizePolicy)
+        self.circle_of_fifths.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.circle_of_fifths.setMinimum(0)
+        self.circle_of_fifths.setMaximum(12)
+        self.circle_of_fifths.setPageStep(1)
+        self.circle_of_fifths.setProperty("value", 6)
+        self.circle_of_fifths.setOrientation(QtCore.Qt.Vertical)
+        self.circle_of_fifths.setWrapping(True)
+        self.circle_of_fifths.setObjectName("circle_of_fifths")
+        self.horizontalLayout_3.addWidget(self.circle_of_fifths)
+
+
         self.scaleOrChordTypeSelector = QComboBoxWithKeyEvents(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(12)

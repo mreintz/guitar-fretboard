@@ -23,6 +23,10 @@ except ModuleNotFoundError:
 
 SETTINGSFILENAME = "fretboard_settings.json"
 
+CIRCLE_OF_FIFTHS = [
+    'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#',
+]
+
 help_messages = [
     ['<space>', 'Toggle between scale and chord'],
     ['I',       'Show notes or (I)ntervals'],
@@ -265,6 +269,8 @@ def select_root_from_label(thing):
     """Selects root note from label click."""
     if isinstance(thing, QLabelClickable):
         selected = thing.objectName()
+    elif isinstance(thing, int):
+        selected = CIRCLE_OF_FIFTHS[thing-1]
     else:
         selected = thing.rootNote
 
@@ -561,6 +567,10 @@ def play(type, *play_args):
                 scale_notes = [(note + i) for i in ui.scale.intervals]
                 play_arpeggio(scale_notes)
 
+def echo(val):
+    """Echo the value of the circle of fifths slider."""
+    ui.statusbar.showMessage(f"Circle of fifths: {CIRCLE_OF_FIFTHS[val-1]}", 10000)
+
 def initial_setup(ui):
     """Initial setup of the UI."""
     ui.showChord = False
@@ -588,6 +598,8 @@ def initial_setup(ui):
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin': toggle(thing))
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
+
+    ui.circle_of_fifths.valueChanged['int'].connect(lambda val = ui.circle_of_fifths.value(): select_root_from_label(val))
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals': toggle(thing) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord': toggle(thing) )

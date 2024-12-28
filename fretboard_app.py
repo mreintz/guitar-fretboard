@@ -285,13 +285,6 @@ def find_key_signature():
     """Find the key signature from the circle of fifths."""
     signature = 0
     index = 0
-    mode = 0
-    mode = ui.scaleOrChordTypeSelector.currentText()
-    if 'major' in mode:
-        mode = 'major'
-    elif 'minor' in mode:
-        mode = 'minor'
-    mode = MODES[mode]
     root_note = ui.rootNoteSelector.currentText()
     if root_note in CIRCLE_OF_FIFTHS:
         index = CIRCLE_OF_FIFTHS.index(root_note)
@@ -304,14 +297,23 @@ def find_key_signature():
                         break
                 break
 
-    signature = index - 5 - mode
-    if signature < -5:
-        signature = signature + 12
     ui.circle_of_fifths.setValue(index+1)
     
     if ui.showChord:
         ui.signature_label.setText('—')
     else:
+        mode = 0
+        mode = ui.scaleOrChordTypeSelector.currentText()
+        if 'major' in mode:
+            mode = 'major'
+        elif 'minor' in mode:
+            mode = 'minor'
+        mode = MODES[mode]
+
+        signature = index - 5 - mode
+        if signature < -5:
+            signature = signature + 12
+
         if signature > 0:
             ui.signature_label.setText(f"{signature} {SHARP}")
         elif signature < 0:

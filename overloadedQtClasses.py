@@ -35,6 +35,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
 class QDialWithKeyEvents(QtWidgets.QDial):
 
     def __init__(self, parent):
+        self.update = True
         super().__init__(parent)
 
     notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(9) ]

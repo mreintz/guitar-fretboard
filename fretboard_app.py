@@ -551,7 +551,7 @@ def change_scale_or_chord():
         ui.scale = Scale(Note(root), type)
         ui.statusbar.showMessage(f"{root} {type}", 10000)
 
-    ui.update_timer.start(400)
+    ui.update_timer.start(200)
 
 def toggle(thing, back):
     """Method to toggle several switches."""
@@ -650,6 +650,8 @@ def initial_setup(ui):
     ui.scaleOrChordSlider.valueChanged['int'].connect(update)
     ui.nutButton.clicked.connect(reset_frets)
     ui.nutButton.rightClicked.connect(lambda window=True: help_message(window))
+    ui.rootNoteSelector.activated.connect(change_scale_or_chord)
+    ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
 
     ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals', back='root': toggle(thing, back) )
     ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord', back='root': toggle(thing, back) )
@@ -720,9 +722,6 @@ def initial_setup(ui):
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populate_fretboard(ui, notes, intervals, midi, ui.frets)
-
-    ui.rootNoteSelector.currentIndexChanged.connect(change_scale_or_chord)
-    ui.scaleOrChordTypeSelector.currentIndexChanged.connect(change_scale_or_chord)
 
     main_window.resize(main_window.minimumSizeHint())
     main_window.adjustSize()

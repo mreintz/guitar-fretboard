@@ -52,34 +52,34 @@ class Fretboard():
                     index = index + 1
             string = string + 1
 
-    def build(self, **kwargs):
+    def build(self, chord=..., scale=..., frets=..., **kwargs):
         """chord=<musthe Chord> OR scale=<musthe Scale>, optional frets=(<fromfret>, <tofret>)
         Returns notes, intervals."""
-        if kwargs:
-            if 'chord' in kwargs:
-                self.chord = kwargs['chord']
-                self.notes = [ str(n) for n in self.chord.notes ]
-                self.intervals = self.chord.recipes[self.chord.chord_type]
-                if 'P8' in self.intervals:
-                    index = self.intervals.index('P8')
-                    del self.notes[index]
-                    del self.intervals[index]
-            elif 'scale' in kwargs:
-                self.scale = kwargs['scale']
-                self.notes = [ str(n) for n in self.scale.notes ]
-                self.intervals = [ str(i) for i in self.scale.intervals ]
-            else:
-                print("You must supply at least one chord= or scale= keyword argument. Reverting to C major.")
-                self.scale = Scale(Note('C'), 'major')
-                self.notes = [ str(n) for n in self.scale.notes ]
-                self.intervals = [ str(i) for i in self.scale.intervals ]
-            if 'frets' in kwargs:
-                self.frets = kwargs['frets']
-                if max(self.frets) > 24 or min(self.frets) < 0:
-                    print("Frets must be between 0 and 24")
-                    self.frets = (0, 24)
-            else:
+        if isinstance(chord, Chord):
+            self.chord = chord
+            self.notes = [ str(n) for n in self.chord.notes ]
+            self.intervals = self.chord.recipes[self.chord.chord_type]
+            if 'P8' in self.intervals:
+                index = self.intervals.index('P8')
+                del self.notes[index]
+                del self.intervals[index]
+        elif isinstance(scale, Scale):
+            self.scale = scale
+            self.notes = [ str(n) for n in self.scale.notes ]
+            self.intervals = [ str(i) for i in self.scale.intervals ]
+        else:
+            print("You must supply at least one chord= or scale= keyword argument. Reverting to C major.")
+            self.scale = Scale(Note('C'), 'major')
+            self.notes = [ str(n) for n in self.scale.notes ]
+            self.intervals = [ str(i) for i in self.scale.intervals ]
+
+        if frets != ...:
+            self.frets = frets
+            if max(self.frets) > 24 or min(self.frets) < 0:
+                print("Frets must be between 0 and 24")
                 self.frets = (0, 24)
+        else:
+            self.frets = (0, 24)
 
         """Place all the submitted notes on the fretboard."""
         notes_grid = []

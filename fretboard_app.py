@@ -538,22 +538,21 @@ def reset_frets():
 
 def change_scale_or_chord():
     """Change from scale to chord or back."""
-    try:
-        delattr(ui, chord)
-    except NameError:
-        try:
-            delattr(ui, scale)
-        except NameError:
-            pass
+    ui.chord = None
+    ui.scale = None
 
     type = ui.scaleOrChordTypeSelector.currentText()
     root = ui.rootNoteSelector.currentText()
+    
     if ui.showChord:
         ui.chord = Chord(Note(root), type)
         ui.statusbar.showMessage(f"{root} {type}", 10000)
     else:
         ui.scale = Scale(Note(root), type)
         ui.statusbar.showMessage(f"{root} {type}", 10000)
+
+    ui.update_timer.start(400)
+
     update()
 
 def toggle(thing, back):
@@ -637,6 +636,12 @@ def initial_setup(ui):
     ui.showInterval = False
     ui.fretSelected = False
     ui.resize = False
+    ui.chord = None
+    ui.scale = None
+
+    ui.update_timer = QtCore.QTimer()
+    ui.update_timer.setSingleShot(True)
+    ui.update_timer.timeout.connect(update)    
 
     # List of all the options for Chord() and Scale()
     ui.allScales = [ s for s in Scale.scales.keys() ]
@@ -647,8 +652,6 @@ def initial_setup(ui):
     ui.scaleOrChordSlider.valueChanged['int'].connect(update)
     ui.nutButton.clicked.connect(reset_frets)
     ui.nutButton.rightClicked.connect(lambda window=True: help_message(window))
-    ui.rootNoteSelector.activated.connect(change_scale_or_chord)
-    ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
 
     ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals', back='root': toggle(thing, back) )
     ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord', back='root': toggle(thing, back) )
@@ -659,7 +662,7 @@ def initial_setup(ui):
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
 
-    ui.circle_of_fifths.valueChanged['int'].connect(lambda val = ui.circle_of_fifths.value(): select_root_from_label(val))
+    ui.circle_of_fifths.valueChanged['int'].connect(select_root_from_label)
     ui.circle_of_fifths.notesOrIntervals.connect(lambda thing='intervals', back='circle': toggle(thing, back) )
     ui.circle_of_fifths.chordOrScale.connect(lambda thing='chord', back='circle': toggle(thing, back) )
     ui.circle_of_fifths.nut.connect(reset_frets)
@@ -719,6 +722,9 @@ def initial_setup(ui):
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populate_fretboard(ui, notes, intervals, midi, ui.frets)
+
+    ui.rootNoteSelector.currentIndexChanged.connect(change_scale_or_chord)
+    ui.scaleOrChordTypeSelector.currentIndexChanged.connect(change_scale_or_chord)
 
     main_window.resize(main_window.minimumSizeHint())
     main_window.adjustSize()

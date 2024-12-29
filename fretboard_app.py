@@ -553,8 +553,6 @@ def change_scale_or_chord():
 
     ui.update_timer.start(400)
 
-    update()
-
 def toggle(thing, back):
     """Method to toggle several switches."""
     if thing == 'intervals':

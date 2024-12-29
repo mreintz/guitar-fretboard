@@ -152,9 +152,9 @@ class Ui_MainWindow(object):
         self.circle_of_fifths.setObjectName("circle_of_fifths")
         self.horizontalLayout_3.addWidget(self.circle_of_fifths)
 
-        self.signature_label = QtWidgets.QLabel(self.centralwidget)
+        self.signature_label = QLabelClickable(self.centralwidget)
         font = QtGui.QFont()
-        font.setPointSize(20)
+        font.setPointSize(15)
         self.signature_label.setFont(font)
         self.signature_label.setAlignment(QtCore.Qt.AlignCenter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)

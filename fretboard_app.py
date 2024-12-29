@@ -330,6 +330,8 @@ def select_root_from_label(thing):
     elif isinstance(thing, int):
         selected = CIRCLE_OF_FIFTHS[thing-1]
         back_to_root = False
+    elif isinstance(thing, str):
+        selected = thing
     else:
         selected = thing.rootNote
 
@@ -628,6 +630,9 @@ def play(type, *play_args):
                 scale_notes = [(note + i) for i in ui.scale.intervals]
                 play_arpeggio(scale_notes)
 
+def toggle_enharmonics():
+    ...
+
 def initial_setup(ui):
     """Initial setup of the UI."""
     ui.showChord = False
@@ -672,6 +677,8 @@ def initial_setup(ui):
     ui.circle_of_fifths.majmin.connect(lambda thing='majmin', back='circle': toggle(thing, back))
     ui.circle_of_fifths.help.connect(lambda window=True: help_message(window))
     ui.circle_of_fifths.play.connect(lambda thing='scale': play(thing))    
+
+    ui.signature_label.clicked.connect(toggle_enharmonics)
 
     ui.scaleOrChordTypeSelector.notesOrIntervals.connect(lambda thing='intervals', back='mode': toggle(thing, back) )
     ui.scaleOrChordTypeSelector.chordOrScale.connect(lambda thing='chord', back='mode': toggle(thing, back) )

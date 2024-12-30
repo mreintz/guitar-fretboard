@@ -485,12 +485,11 @@ def update():
     find_key_signature()
 
     if ui.check_signature:
-        print('check_signature')
         if (SHARP in ui.signature_label.text()) and (FLAT in ui.titleLabel.text()):
             toggle_enharmonics()
         elif (FLAT in ui.signature_label.text()) and (SHARP in ui.titleLabel.text()):
             toggle_enharmonics()
-
+        ui.check_signature = False
 
 def tune_with_octave(tuning):
     """Set the tuning with octave."""
@@ -648,7 +647,7 @@ def toggle_enharmonics():
             elif index == 1:
                 new_rootnote = row[0]
             select_root_from_label(new_rootnote)
-            print(f"Enharmonic: {root_note} -> {new_rootnote}")
+            ui.statusbar.showMessage(f"Enharmonic: {root_note} -> {new_rootnote}", 10000)
 
     select('circle')
 
@@ -659,6 +658,10 @@ def on_circle_of_fifths_value_changed(value):
     else:
         ui.check_signature = False
         pass
+
+def check_signature_then_change_scale_or_chord():
+    ui.check_signature = True
+    change_scale_or_chord()
 
 def initial_setup(ui):
     """Initial setup of the UI."""
@@ -684,7 +687,7 @@ def initial_setup(ui):
     ui.nutButton.clicked.connect(reset_frets)
     ui.nutButton.rightClicked.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.activated.connect(change_scale_or_chord)
-    ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
+    ui.scaleOrChordTypeSelector.activated.connect(check_signature_then_change_scale_or_chord)
 
     ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals', back='root': toggle(thing, back) )
     ui.rootNoteSelector.chordOrScale.connect(lambda thing='chord', back='root': toggle(thing, back) )

@@ -35,8 +35,8 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
 class QDialWithKeyEvents(QtWidgets.QDial):
 
     def __init__(self, parent):
-        self.update = True
         super().__init__(parent)
+        self.user_interaction = False
 
     notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(9) ]
 
@@ -53,6 +53,12 @@ class QDialWithKeyEvents(QtWidgets.QDial):
             self.mode.emit()
         elif event.key() == QtCore.Qt.Key_Left:
             self.root.emit()
+        elif event.key() == QtCore.Qt.Key_Up:
+            self.user_interaction = True
+            super(QDialWithKeyEvents, self).keyPressEvent(event)
+        elif event.key() == QtCore.Qt.Key_Down:
+            self.user_interaction = True
+            super(QDialWithKeyEvents, self).keyPressEvent(event)
         elif event.key() == QtCore.Qt.Key_T:
             self.tuning.emit()
         elif event.key() == QtCore.Qt.Key_M:
@@ -63,6 +69,18 @@ class QDialWithKeyEvents(QtWidgets.QDial):
             self.play.emit()
         else:
             super(QDialWithKeyEvents, self).keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        super(QDialWithKeyEvents, self).keyReleaseEvent(event)
+        self.user_interaction = False
+
+    def mousePressEvent(self, event):
+        self.user_interaction = True
+        super(QDialWithKeyEvents, self).mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        super(QDialWithKeyEvents, self).mouseReleaseEvent(event)
+        self.user_interaction = False    
 
 class QLineEditTabReact(QtWidgets.QLineEdit):
     def __init__(self, parent):

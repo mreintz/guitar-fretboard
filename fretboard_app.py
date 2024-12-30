@@ -326,13 +326,11 @@ def select_root_from_label(thing):
     back_to_root = True
 
     if isinstance(thing, QLabelClickable):
-        ui.circle_of_fifths.update = False
         selected = thing.objectName()
     elif isinstance(thing, int):
         selected = CIRCLE_OF_FIFTHS[thing-1]
         back_to_root = False
     elif isinstance(thing, str):
-        ui.circle_of_fifths.update = False
         selected = thing
     else:
         selected = thing.rootNote
@@ -486,6 +484,14 @@ def update():
 
     find_key_signature()
 
+    if ui.check_signature:
+        print('check_signature')
+        if (SHARP in ui.signature_label.text()) and (FLAT in ui.titleLabel.text()):
+            toggle_enharmonics()
+        elif (FLAT in ui.signature_label.text()) and (SHARP in ui.titleLabel.text()):
+            toggle_enharmonics()
+
+
 def tune_with_octave(tuning):
     """Set the tuning with octave."""
     ui.tuning_with_octave = tuning
@@ -540,14 +546,10 @@ def reset_frets():
     update()
     ui.rootNoteSelector.setFocus()
 
-def change_scale_or_chord(**kwargs):
+def change_scale_or_chord():
     """Change from scale to chord or back."""
     ui.chord = None
     ui.scale = None
-
-    if kwargs:
-        if 'update_circle' in kwargs:
-            ui.circle_of_fifths.update = kwargs['update_circle']
 
     type = ui.scaleOrChordTypeSelector.currentText()
     root = ui.rootNoteSelector.currentText()
@@ -640,21 +642,23 @@ def toggle_enharmonics():
     root_note = ui.rootNoteSelector.currentText()
     for row in ui.enharmonics:
         if root_note in row:
-            try:
-                index = row.index(root_note)
-                new_rootnote = row[index+1]
-                if new_rootnote == root_note:
-                    new_rootnote = row[index+2]
-                select_root_from_label(new_rootnote)
-            except IndexError:
+            index = row.index(root_note)
+            if index == 0:
+                new_rootnote = row[1]
+            elif index == 1:
                 new_rootnote = row[0]
-                select_root_from_label(new_rootnote)
+            select_root_from_label(new_rootnote)
+            print(f"Enharmonic: {root_note} -> {new_rootnote}")
 
-def update_circle():
-    if ui.circle_of_fifths.update == True:
-        select_root_from_label(ui.circle_of_fifths.value())
+    select('circle')
+
+def on_circle_of_fifths_value_changed(value):
+    if ui.circle_of_fifths.user_interaction:
+        ui.check_signature = True
+        select_root_from_label(value)
     else:
-        ui.circle_of_fifths.update = True
+        ui.check_signature = False
+        pass
 
 def initial_setup(ui):
     """Initial setup of the UI."""
@@ -664,6 +668,7 @@ def initial_setup(ui):
     ui.resize = False
     ui.chord = None
     ui.scale = None
+    ui.check_signature = False
 
     ui.update_timer = QtCore.QTimer()
     ui.update_timer.setSingleShot(True)
@@ -678,7 +683,7 @@ def initial_setup(ui):
     ui.scaleOrChordSlider.valueChanged['int'].connect(update)
     ui.nutButton.clicked.connect(reset_frets)
     ui.nutButton.rightClicked.connect(lambda window=True: help_message(window))
-    ui.rootNoteSelector.activated.connect(lambda update_circle=False: change_scale_or_chord(update_circle=update_circle))
+    ui.rootNoteSelector.activated.connect(change_scale_or_chord)
     ui.scaleOrChordTypeSelector.activated.connect(change_scale_or_chord)
 
     ui.rootNoteSelector.notesOrIntervals.connect(lambda thing='intervals', back='root': toggle(thing, back) )
@@ -690,7 +695,7 @@ def initial_setup(ui):
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
 
-    ui.circle_of_fifths.valueChanged['int'].connect(update_circle)
+    ui.circle_of_fifths.valueChanged['int'].connect(on_circle_of_fifths_value_changed)
     ui.circle_of_fifths.notesOrIntervals.connect(lambda thing='intervals', back='circle': toggle(thing, back) )
     ui.circle_of_fifths.chordOrScale.connect(lambda thing='chord', back='circle': toggle(thing, back) )
     ui.circle_of_fifths.nut.connect(reset_frets)

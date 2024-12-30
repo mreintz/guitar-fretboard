@@ -655,11 +655,12 @@ def toggle_enharmonics():
     select_root_from_label(new_rootnote)
     ui.statusbar.showMessage(f"Enharmonic: {root_note} -> {new_rootnote}", 10000)
 
-    select('circle')
+    select(ui.back_to)
 
 def on_circle_of_fifths_value_changed(value):
     if ui.circle_of_fifths.user_interaction:
         ui.check_signature = True
+        ui.back_to  = 'circle'
         select_root_from_label(value)
     else:
         ui.check_signature = False
@@ -667,6 +668,7 @@ def on_circle_of_fifths_value_changed(value):
 
 def check_signature_then_change_scale_or_chord():
     ui.check_signature = True
+    ui.back_to = 'mode'
     change_scale_or_chord()
 
 def initial_setup(ui):
@@ -678,6 +680,7 @@ def initial_setup(ui):
     ui.chord = None
     ui.scale = None
     ui.check_signature = False
+    ui.back_to = 'root'
 
     ui.update_timer = QtCore.QTimer()
     ui.update_timer.setSingleShot(True)

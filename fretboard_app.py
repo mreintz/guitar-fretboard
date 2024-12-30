@@ -348,7 +348,7 @@ def select_root_from_label(thing):
                         break
     change_scale_or_chord()
     if back_to_root:
-        ui.rootNoteSelector.setFocus()
+        select('root') #ui.rootNoteSelector.setFocus()
 
 def toggle_transparency(label):
     """Toggle the transparency of a label."""
@@ -393,7 +393,7 @@ def set_fret(fret):
             update()
             ui.statusbar.showMessage("Reverting to previous fret selection.", 10000)
 
-    ui.rootNoteSelector.setFocus()
+    select('root') #ui.rootNoteSelector.setFocus()
 
 def clear_from_grid(widget):
     """Clear a widget from the grid."""
@@ -543,7 +543,7 @@ def reset_frets():
     """Reset the frets to the number specified in the model for the instrument."""
     ui.frets = ui.resetFrets
     update()
-    ui.rootNoteSelector.setFocus()
+    select('root') #ui.rootNoteSelector.setFocus()
 
 def change_scale_or_chord():
     """Change from scale to chord or back."""
@@ -595,19 +595,37 @@ def toggle(thing, back):
 def edit_tuning_peg(string):
     """Start editing from the topmost string."""
     ui.tuningButtons[string].setFocus()
+    set_active_widget(ui.tuningButtons[string])
     ui.tuningButtons[string].selectAll()
+
+def set_active_widget(widget):
+    """Set the active widget with a shadow effect."""
+    # Remove shadow effect from all widgets
+    for w in [ui.scaleOrChordTypeSelector, ui.rootNoteSelector, ui.circle_of_fifths, *ui.tuningButtons]:
+        w.setGraphicsEffect(None)
+
+    # Apply the shadow effect to the active widget
+    shadow = QtWidgets.QGraphicsDropShadowEffect()
+    shadow.setBlurRadius(15)
+    shadow.setColor(QtGui.QColor(255, 215, 0))  # Gold color
+    shadow.setOffset(0, 0)
+    widget.setGraphicsEffect(shadow)
 
 def select(thing):
     """Method to select different widgets."""
     if thing == 'mode':
         ui.scaleOrChordTypeSelector.setFocus()
+        set_active_widget(ui.scaleOrChordTypeSelector)
     elif thing == 'root':
         ui.rootNoteSelector.setFocus()
+        set_active_widget(ui.rootNoteSelector)
     elif thing == 'circle':
         ui.circle_of_fifths.setFocus()
+        set_active_widget(ui.circle_of_fifths)
     elif thing == 'tuning':
         ui.tuningButtons[0].setFocus()
         ui.tuningButtons[0].selectAll()
+        set_active_widget(ui.tuningButtons[0])
         ui.statusbar.showMessage("Change tuning. Tab or Enter to set new tuning, Esc to return.", 10000)
 
 def help_message(show_window):
@@ -776,7 +794,7 @@ def initial_setup(ui):
 
     help_message(False)  # Just show the prompt in the status bar.
 
-    ui.rootNoteSelector.setFocus()
+    select('root') #ui.rootNoteSelector.setFocus()
     return(True)
 
 def edit_settings():

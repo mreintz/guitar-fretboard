@@ -8,6 +8,24 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
 
     notesOrIntervals, chordOrScale, nut, root, circle, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(10) ]
 
+    def focusInEvent(self, event):
+        self.set_glow_effect(True)
+        super().focusInEvent(event)
+
+    def focusOutEvent(self, event):
+        self.set_glow_effect(False)
+        super().focusOutEvent(event)
+
+    def set_glow_effect(self, enabled):
+        if enabled:
+            shadow = QtWidgets.QGraphicsDropShadowEffect()
+            shadow.setBlurRadius(15)
+            shadow.setColor(QtGui.QColor(255, 215, 0))  # Gold color
+            shadow.setOffset(0, 0)
+            self.setGraphicsEffect(shadow)
+        else:
+            self.setGraphicsEffect(None)
+
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
             self.notesOrIntervals.emit()
@@ -88,6 +106,24 @@ class QLineEditTabReact(QtWidgets.QLineEdit):
         super().__init__(parent)
 
     escape, selected, edit = [ pyqtSignal() for i in range(3) ]
+
+    def focusInEvent(self, event):
+        self.set_glow_effect(True)
+        super().focusInEvent(event)
+
+    def focusOutEvent(self, event):
+        self.set_glow_effect(False)
+        super().focusOutEvent(event)
+
+    def set_glow_effect(self, enabled):
+        if enabled:
+            shadow = QtWidgets.QGraphicsDropShadowEffect()
+            shadow.setBlurRadius(15)
+            shadow.setColor(QtGui.QColor(255, 215, 0))  # Gold color
+            shadow.setOffset(0, 0)
+            self.setGraphicsEffect(shadow)
+        else:
+            self.setGraphicsEffect(None)
 
     def event(self,event):
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:

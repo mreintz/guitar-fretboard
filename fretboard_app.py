@@ -639,15 +639,21 @@ def play(type, *play_args):
 
 def toggle_enharmonics():
     root_note = ui.rootNoteSelector.currentText()
-    for row in ui.enharmonics:
-        if root_note in row:
-            index = row.index(root_note)
-            if index == 0:
-                new_rootnote = row[1]
-            elif index == 1:
-                new_rootnote = row[0]
-            select_root_from_label(new_rootnote)
-            ui.statusbar.showMessage(f"Enharmonic: {root_note} -> {new_rootnote}", 10000)
+    if root_note == 'F':
+        new_rootnote = 'E#'
+    elif root_note == 'E#':
+        new_rootnote = 'F'
+    else:
+        for row in ui.enharmonics:
+            if root_note in row:
+                index = row.index(root_note)
+                if index == 0:
+                    new_rootnote = row[1]
+                elif index == 1:
+                    new_rootnote = row[0]
+                break
+    select_root_from_label(new_rootnote)
+    ui.statusbar.showMessage(f"Enharmonic: {root_note} -> {new_rootnote}", 10000)
 
     select('circle')
 
@@ -747,6 +753,7 @@ def initial_setup(ui):
                  'D#',
                  'Eb',
                  'E',
+                 'E#',
                  'F',
                  'F#',
                  'Gb',

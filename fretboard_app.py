@@ -49,6 +49,8 @@ help_messages = [
     ['N',       'Revert number of frets to (N)ormal'],
     ['Arrows',  'Select root note and type'],
     ['M',       'Toggle between (M)ajor and (M)inor modes'],
+    ['T',       'Change (T)uning'],
+    ['S',       'Toggle between enharmonics for the key (S)ignature'],
     ['Fret buttons',    'Click to zoom in on frets'],
     ['Left click on note', 'Play note if sound support, otherwise toggle transparency'],
     ['Ctrl+Left click on note', 'If sound support, toggle transparency'],
@@ -655,7 +657,10 @@ def play(type, *play_args):
                 scale_notes = [(note + i) for i in ui.scale.intervals]
                 play_arpeggio(scale_notes)
 
-def toggle_enharmonics():
+def toggle_enharmonics(back_to = ...):
+    """Toggle between enharmonics."""
+    if back_to != ...:
+        ui.back_to = back_to
     root_note = ui.rootNoteSelector.currentText()
     if root_note == 'F':
         new_rootnote = 'E#'
@@ -676,6 +681,7 @@ def toggle_enharmonics():
     select(ui.back_to)
 
 def on_circle_of_fifths_value_changed(value):
+    """Change the root note from the circle of fifths and check signature."""
     if ui.circle_of_fifths.user_interaction:
         ui.check_signature = True
         ui.back_to  = 'circle'
@@ -685,6 +691,7 @@ def on_circle_of_fifths_value_changed(value):
         pass
 
 def check_signature_then_change_scale_or_chord():
+    """Check the key signature before changing scale or chord."""
     ui.check_signature = True
     ui.back_to = 'mode'
     change_scale_or_chord()
@@ -724,6 +731,7 @@ def initial_setup(ui):
     ui.rootNoteSelector.majmin.connect(lambda thing='majmin', back='root': toggle(thing, back))
     ui.rootNoteSelector.help.connect(lambda window=True: help_message(window))
     ui.rootNoteSelector.play.connect(lambda thing='scale': play(thing))
+    ui.rootNoteSelector.signature.connect(lambda back_to = 'root': toggle_enharmonics(back_to=back_to))
 
     ui.circle_of_fifths.valueChanged['int'].connect(on_circle_of_fifths_value_changed)
     ui.circle_of_fifths.notesOrIntervals.connect(lambda thing='intervals', back='circle': toggle(thing, back) )
@@ -734,7 +742,8 @@ def initial_setup(ui):
     ui.circle_of_fifths.tuning.connect(lambda thing='tuning': select(thing))
     ui.circle_of_fifths.majmin.connect(lambda thing='majmin', back='circle': toggle(thing, back))
     ui.circle_of_fifths.help.connect(lambda window=True: help_message(window))
-    ui.circle_of_fifths.play.connect(lambda thing='scale': play(thing))    
+    ui.circle_of_fifths.play.connect(lambda thing='scale': play(thing))
+    ui.circle_of_fifths.signature.connect(lambda back_to = 'circle': toggle_enharmonics(back_to=back_to))
 
     ui.signature_label.clicked.connect(toggle_enharmonics)
 
@@ -746,6 +755,7 @@ def initial_setup(ui):
     ui.scaleOrChordTypeSelector.majmin.connect(lambda thing='majmin', back='mode': toggle(thing, back))
     ui.scaleOrChordTypeSelector.help.connect(lambda window=True: help_message(window))
     ui.scaleOrChordTypeSelector.play.connect(lambda thing='scale': play(thing))
+    ui.scaleOrChordTypeSelector.signature.connect(lambda back_to = 'mode': toggle_enharmonics(back_to=back_to))
 
     ui.titleLabel.clicked.connect(lambda thing='scale': play(thing))
     ui.titleLabel.selected.connect(lambda thing='arpeggio': play(thing))

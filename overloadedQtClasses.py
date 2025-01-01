@@ -6,7 +6,7 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
     def __init__(self, parent):
         super().__init__(parent)
 
-    notesOrIntervals, chordOrScale, nut, root, circle, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(10) ]
+    notesOrIntervals, chordOrScale, nut, root, circle, mode, tuning, majmin, help, play, signature = [ pyqtSignal() for i in range(11) ]
 
     def focusInEvent(self, event):
         self.set_glow_effect(True)
@@ -47,6 +47,8 @@ class QComboBoxWithKeyEvents(QtWidgets.QComboBox):
             self.help.emit()
         elif event.key() == QtCore.Qt.Key_Return:
             self.play.emit()
+        elif event.key() == QtCore.Qt.Key_S:
+            self.signature.emit()            
         else:
             super(QComboBoxWithKeyEvents, self).keyPressEvent(event)
 
@@ -56,7 +58,7 @@ class QDialWithKeyEvents(QtWidgets.QDial):
         super().__init__(parent)
         self.user_interaction = False
 
-    notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play = [ pyqtSignal() for i in range(9) ]
+    notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play, signature = [ pyqtSignal() for i in range(10) ]
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
@@ -85,6 +87,8 @@ class QDialWithKeyEvents(QtWidgets.QDial):
             self.help.emit()
         elif event.key() == QtCore.Qt.Key_Return:
             self.play.emit()
+        elif event.key() == QtCore.Qt.Key_S:
+            self.signature.emit()
         else:
             super(QDialWithKeyEvents, self).keyPressEvent(event)
 

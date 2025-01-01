@@ -1,5 +1,8 @@
 # guitar-fretboard
 
+<b>New functionality: Option to set rootnote using circle of fifths dial. Calculation of key signature and automatic enharmonic lookup when using the circle of fifths option. Click on signature to toggle between flats and sharps where available. Click '?' for extended help.<br>
+![image](https://github.com/user-attachments/assets/9beb5af4-f421-4de0-851d-7d5de8f0d946)
+
 <b>New functionality! Sound support</b> Click on scale or chord to play. 
 Full octave support. Illustrated Nashville tuning for guitar:<br>
 ![image](https://github.com/user-attachments/assets/f8b2bc5c-3a60-4e84-86e4-70de4146b452)

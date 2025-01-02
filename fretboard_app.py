@@ -170,22 +170,22 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
                 if ui.showInterval:
                     interval =  label.objectName()
                     if interval != "P1":
-                        intervalType = interval[0]
+                        interval_type = interval[0]
                     else:
-                        intervalType = interval
+                        interval_type = interval
                 else:
                     try:
                         interval = intervals[i][notes[i].index(label.objectName())]
                         if interval != "P1":
-                            intervalType = interval[0]
+                            interval_type = interval[0]
                         else:
-                            intervalType = interval
+                            interval_type = interval
                     except ValueError:
-                        intervalType = ''
+                        interval_type = ''
                 label.setStyleSheet("QLabel"
                             "{"
                             "border : 3px solid ;"
-                            f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
+                            f"{INTERVAL_COLORS.get(interval_type, LABEL_COLORS[6])}"
                             "border-color : black"
                             "}")
 
@@ -235,49 +235,37 @@ def populate_fretboard(ui, notes, intervals, midi, frets):
             ui.gridLayout.addWidget(dot, ui.strings+1, 2*j-1, 1, 1)
             ui.fretMarkers.append(dot)
 
-    # "Flatten" the notes and intervals into a single list for easy lookup.
-    flattened_notes = []
-    flattened_intervals = []
-    for row in notes:
-        flattened_notes += row
-    for row in intervals:
-        flattened_intervals += row
-
     # Set up the "tuning peg" values and interval colors if open strings are on the chord or scale.
     for i, peg in enumerate(ui.tuningButtons):
         text = ui.tuning[i]
         peg.setStyleSheet("QLineEdit")
 
-        try:
-            interval = flattened_intervals[flattened_notes.index(text)]
-            if interval != "P1":
-                intervalType = interval[0]
-            else:
-                intervalType = interval
-        except ValueError:
-            interval = ''
+        interval = ''
+        interval_type = ''
+        for row_notes, row_intervals in zip(notes, intervals):
+            if text in row_notes:
+                interval = row_intervals[row_notes.index(text)]
+                interval_type = interval[0] if interval != "P1" else interval
+                break
 
-        for row in notes:
-            for note in row:
+        for row_notes, row_intervals in zip(notes, intervals):
+            for note, note_interval in zip(row_notes, row_intervals):
                 if text == note:
                     peg.setStyleSheet("QLineEdit"
                                 "{"
                                 "border : 3px solid ;"
-                                f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
+                                f"{INTERVAL_COLORS.get(interval_type, LABEL_COLORS[6])}"
                                 "border-color : black"
                                 "}")
                 else:
-                    for enharmonicRow in ui.enharmonics:
-                        if (text in enharmonicRow and note in enharmonicRow):
-                            interval = flattened_intervals[flattened_notes.index(note)]
-                            if interval != "P1":
-                                intervalType = interval[0]
-                            else:
-                                intervalType = interval
+                    for enharmonic_row in ui.enharmonics:
+                        if (text in enharmonic_row and note in enharmonic_row):
+                            interval = note_interval
+                            interval_type = interval[0] if interval != "P1" else interval
                             peg.setStyleSheet("QLineEdit"
                                         "{"
                                         "border : 3px solid ;"
-                                        f"{INTERVAL_COLORS.get(intervalType, LABEL_COLORS[6])}"
+                                        f"{INTERVAL_COLORS.get(interval_type, LABEL_COLORS[6])}"
                                         "border-color : black"
                                         "}")
         peg.rootNote = text
@@ -892,6 +880,7 @@ if __name__ == "__main__":
     help_dialog = QtWidgets.QDialog()
     setup_help_dialog(help_dialog)
     ui = Ui_MainWindow()
+    ui.labels = []
     ui.enharmonics = []
     ui.allScales = []
     ui.allChords = []

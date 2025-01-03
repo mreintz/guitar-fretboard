@@ -481,6 +481,11 @@ def update():
             toggle_enharmonics()
         ui.check_signature = False
 
+def force_resize():
+    """Force the main window to resize."""
+    main_window.resize(main_window.minimumSizeHint())
+    main_window.adjustSize()
+
 def tune_with_octave(tuning):
     """Set the tuning with octave."""
     ui.tuning_with_octave = tuning
@@ -792,7 +797,11 @@ def initial_setup(ui):
 
     help_message(False)  # Just show the prompt in the status bar.
 
-    select('root') #ui.rootNoteSelector.setFocus()
+    select('root') 
+
+    # Force a resize after a short delay to ensure all components are rendered
+    QtCore.QTimer.singleShot(100, force_resize)
+
     return(True)
 
 def edit_settings():

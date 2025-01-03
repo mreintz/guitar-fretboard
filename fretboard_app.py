@@ -791,12 +791,7 @@ def initial_setup(ui):
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
     populate_fretboard(ui, notes, intervals, midi, ui.frets)
-
-    main_window.resize(main_window.minimumSizeHint())
-    main_window.adjustSize()
-
     help_message(False)  # Just show the prompt in the status bar.
-
     select('root') 
 
     # Force a resize after a short delay to ensure all components are rendered

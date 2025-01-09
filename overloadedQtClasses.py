@@ -60,6 +60,24 @@ class QDialWithKeyEvents(QtWidgets.QDial):
 
     notesOrIntervals, chordOrScale, nut, root, mode, tuning, majmin, help, play, signature = [ pyqtSignal() for i in range(10) ]
 
+    def focusInEvent(self, event):
+        self.set_glow_effect(True)
+        super().focusInEvent(event)
+
+    def focusOutEvent(self, event):
+        self.set_glow_effect(False)
+        super().focusOutEvent(event)
+
+    def set_glow_effect(self, enabled):
+        if enabled:
+            shadow = QtWidgets.QGraphicsDropShadowEffect()
+            shadow.setBlurRadius(15)
+            shadow.setColor(QtGui.QColor(255, 215, 0))  # Gold color
+            shadow.setOffset(0, 0)
+            self.setGraphicsEffect(shadow)
+        else:
+            self.setGraphicsEffect(None)
+
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_I:
             self.notesOrIntervals.emit()

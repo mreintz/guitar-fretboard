@@ -767,7 +767,6 @@ def initial_setup(ui):
 
     f = Fretboard(tuning=ui.tuning)
     notes, intervals, midi = f.build(scale=ui.scale, frets=ui.frets)
-
     ui.enharmonics = f.enharmonics
 
     ui.rootNotes = ['C',
@@ -790,6 +789,7 @@ def initial_setup(ui):
                  'B',]
 
     ui.rootNoteSelector.addItems(ui.rootNotes)
+
     populate_fretboard(ui, notes, intervals, midi, ui.frets)
     help_message(False)  # Just show the prompt in the status bar.
     select('root') 

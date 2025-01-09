@@ -192,7 +192,8 @@ class Ui_MainWindow(object):
             MainWindow.setTabOrder(self.tuningButtons[i], self.tuningButtons[i+1])
 
         MainWindow.setTabOrder(self.tuningButtons[strings-1], self.rootNoteSelector)
-        MainWindow.setTabOrder(self.rootNoteSelector, self.scaleOrChordTypeSelector)
+        MainWindow.setTabOrder(self.rootNoteSelector, self.circle_of_fifths)
+        MainWindow.setTabOrder(self.circle_of_fifths, self.scaleOrChordTypeSelector)
         MainWindow.setTabOrder(self.scaleOrChordTypeSelector, self.notesOrIntervalsSlider)
         MainWindow.setTabOrder(self.notesOrIntervalsSlider, self.scaleOrChordSlider)
         MainWindow.setTabOrder(self.scaleOrChordSlider, self.nutButton)
